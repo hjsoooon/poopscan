@@ -1,0 +1,7 @@
+{
+  "name": "PoopScan AI",
+  "description": "An AI-powered newborn diaper analysis tool that helps parents track baby health through simple photo scans.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
