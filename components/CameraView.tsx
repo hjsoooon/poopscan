@@ -264,7 +264,7 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, captur
                 <i className="fa-solid fa-poop text-3xl"></i>
               </div>
               <h2 className="text-xl font-bold">PoopScan AI</h2>
-              <p className="text-blue-100 text-sm mt-1">아기 대변 AI 분석 서비스</p>
+              <p className="text-blue-100 text-sm mt-1">아기 기저귀 AI 분석 서비스</p>
             </div>
             
             {/* Content */}
