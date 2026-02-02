@@ -63,6 +63,9 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
 📊 상태: ${analysis.statusLabel}
 🎨 색상: ${analysis.color}
 💧 제형: ${analysis.consistency}
+📦 양: ${analysis.amount}
+👃 냄새: ${analysis.smell}
+💦 수분 상태: ${analysis.hydration}
 📝 오늘 ${analysis.frequencyToday}번째
 
 💡 AI 가이드:
@@ -211,73 +214,197 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
         </div>
 
         {/* Diaper Image Section */}
-        <div className="relative rounded-3xl overflow-hidden aspect-[4/3] shadow-2xl shadow-blue-900/10 group">
+        <div className="relative rounded-2xl overflow-hidden aspect-[4/3] shadow-lg">
           <img src={image} className="w-full h-full object-cover" alt="Diaper scan" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
           
-          {/* AI Markers */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-             <div className="relative">
-                <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold shadow-lg border border-white whitespace-nowrap">
-                   배변 영역 감지
-                </div>
-                <div className="w-16 h-16 border-2 border-white/50 rounded-full animate-ping"></div>
-                <div className="absolute inset-0 w-16 h-16 border-2 border-white rounded-full flex items-center justify-center">
-                   <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                </div>
-             </div>
-          </div>
-          
-          <div className="absolute top-4 left-4 bg-black/40 backdrop-blur-md text-white text-[10px] px-3 py-1 rounded-full flex items-center gap-2">
-            <i className="fa-solid fa-camera"></i>
-            시료 분석 기록
+          {/* 분석 시간 */}
+          <div className="absolute top-3 left-3 bg-black/40 backdrop-blur-md text-white text-[10px] px-2.5 py-1 rounded-full flex items-center gap-1.5">
+            <i className="fa-solid fa-clock"></i>
+            {analysis.analysisTime}
           </div>
 
-          <div className="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur-md p-3 rounded-2xl flex items-center justify-between border border-white/50">
-             <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center text-white">
-                  <i className="fa-solid fa-wand-magic-sparkles text-sm"></i>
+          {/* 신뢰도 */}
+          <div className="absolute top-3 right-3 bg-black/40 backdrop-blur-md text-white text-[10px] px-2.5 py-1 rounded-full flex items-center gap-1.5">
+            <i className="fa-solid fa-robot"></i>
+            신뢰도 {analysis.confidenceScore}%
+          </div>
+
+          {/* 하단 정보 */}
+          <div className="absolute bottom-3 left-3 right-3 bg-white/95 backdrop-blur-md p-2.5 rounded-xl flex items-center justify-between">
+             <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-lg bg-blue-500 flex items-center justify-center text-white">
+                  <i className="fa-solid fa-wand-magic-sparkles text-xs"></i>
                 </div>
                 <div>
                    <p className="text-[10px] font-bold text-gray-400">AI 분석 완료</p>
-                   <p className="text-xs font-bold">2개 특이점 발견</p>
+                   <p className="text-[11px] font-bold">
+                     {analysis.warningSigns && analysis.warningSigns.length > 0 
+                       ? `${analysis.warningSigns.length}개 주의사항 발견` 
+                       : '이상 소견 없음'}
+                   </p>
                 </div>
              </div>
-             <i className="fa-solid fa-chevron-right text-gray-300"></i>
+             <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+               analysis.status === 'normal' ? 'bg-green-100 text-green-600' :
+               analysis.status === 'caution' ? 'bg-orange-100 text-orange-600' :
+               'bg-red-100 text-red-600'
+             }`}>
+               <i className={`fa-solid ${analysis.status === 'normal' ? 'fa-check' : 'fa-exclamation'}`}></i>
+             </div>
           </div>
         </div>
 
-        {/* Details Grid */}
-        <div className="grid grid-cols-2 gap-3">
-           <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col gap-1">
-              <div className="flex items-center justify-between mb-1">
-                 <span className="text-xs font-bold text-gray-400">색상</span>
-                 <div className="w-4 h-4 rounded-full border shadow-sm" style={{backgroundColor: analysis.colorHex}}></div>
-              </div>
-              <p className="text-base font-bold">{analysis.color}</p>
-              <p className="text-[10px] text-gray-400">표준 지표</p>
+        {/* 주요 분석 지표 */}
+        <div className="grid grid-cols-3 gap-2">
+           <div className="bg-white p-3 rounded-xl border border-gray-100 shadow-sm text-center">
+              <div className="w-5 h-5 rounded-full border-2 mx-auto mb-1" style={{backgroundColor: analysis.colorHex}}></div>
+              <p className="text-xs font-bold">{analysis.color}</p>
+              <p className="text-[9px] text-gray-400">색상</p>
            </div>
            
-           <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col gap-1">
-              <div className="flex items-center justify-between mb-1">
-                 <span className="text-xs font-bold text-gray-400">횟수</span>
-                 <i className="fa-solid fa-clock-rotate-left text-gray-300"></i>
-              </div>
-              <p className="text-base font-bold">오늘 {analysis.frequencyToday}번째</p>
-              <p className="text-[10px] text-gray-400">일일 기록</p>
+           <div className="bg-white p-3 rounded-xl border border-gray-100 shadow-sm text-center">
+              <i className="fa-solid fa-droplet text-blue-500 mb-1"></i>
+              <p className="text-xs font-bold">{analysis.consistency}</p>
+              <p className="text-[9px] text-gray-400">제형</p>
            </div>
 
-           <div className="col-span-2 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
-              <div>
-                 <span className="text-xs font-bold text-gray-400 block mb-1">제형</span>
-                 <p className="text-lg font-bold text-orange-600">{analysis.consistency}</p>
-                 <p className="text-[10px] text-gray-400">관찰 후 주의</p>
-              </div>
-              <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center text-orange-500">
-                <i className="fa-solid fa-droplet text-lg"></i>
-              </div>
+           <div className="bg-white p-3 rounded-xl border border-gray-100 shadow-sm text-center">
+              <i className="fa-solid fa-cubes text-purple-500 mb-1"></i>
+              <p className="text-xs font-bold">{analysis.amount}</p>
+              <p className="text-[9px] text-gray-400">양</p>
            </div>
         </div>
+
+        {/* 상세 분석 카드 */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="px-4 py-3 bg-gray-50 border-b border-gray-100">
+            <h3 className="text-sm font-bold flex items-center gap-2">
+              <i className="fa-solid fa-microscope text-blue-500"></i>
+              상세 분석 결과
+            </h3>
+          </div>
+          
+          <div className="divide-y divide-gray-50">
+            {/* 배변 횟수 */}
+            <div className="px-4 py-3 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <i className="fa-solid fa-clock-rotate-left text-blue-600 text-sm"></i>
+                </div>
+                <span className="text-sm text-gray-600">오늘 배변 횟수</span>
+              </div>
+              <span className="text-sm font-bold">{analysis.frequencyToday}회</span>
+            </div>
+            
+            {/* 냄새 */}
+            <div className="px-4 py-3 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                  <i className="fa-solid fa-wind text-green-600 text-sm"></i>
+                </div>
+                <span className="text-sm text-gray-600">냄새</span>
+              </div>
+              <span className={`text-sm font-bold ${analysis.smell === '악취' || analysis.smell === '시큼함' ? 'text-orange-500' : 'text-gray-800'}`}>
+                {analysis.smell}
+              </span>
+            </div>
+            
+            {/* 수분 상태 */}
+            <div className="px-4 py-3 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-cyan-100 rounded-lg flex items-center justify-center">
+                  <i className="fa-solid fa-tint text-cyan-600 text-sm"></i>
+                </div>
+                <span className="text-sm text-gray-600">수분/탈수 상태</span>
+              </div>
+              <span className={`text-sm font-bold px-2 py-0.5 rounded-full ${
+                analysis.hydration === '양호' ? 'bg-green-100 text-green-700' :
+                analysis.hydration === '주의' ? 'bg-orange-100 text-orange-700' :
+                'bg-gray-100 text-gray-700'
+              }`}>
+                {analysis.hydration}
+              </span>
+            </div>
+
+            {/* 브리스톨 척도 */}
+            <div className="px-4 py-3 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
+                  <i className="fa-solid fa-chart-simple text-amber-600 text-sm"></i>
+                </div>
+                <span className="text-sm text-gray-600">브리스톨 척도</span>
+              </div>
+              <div className="flex items-center gap-1">
+                {[1,2,3,4,5,6,7].map(n => (
+                  <div 
+                    key={n} 
+                    className={`w-4 h-4 rounded-full text-[8px] flex items-center justify-center font-bold ${
+                      n === analysis.bristolType 
+                        ? 'bg-amber-500 text-white' 
+                        : 'bg-gray-100 text-gray-400'
+                    }`}
+                  >
+                    {n}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 추가 관찰 항목 */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="px-4 py-3 bg-gray-50 border-b border-gray-100">
+            <h3 className="text-sm font-bold flex items-center gap-2">
+              <i className="fa-solid fa-clipboard-check text-green-500"></i>
+              추가 관찰 항목
+            </h3>
+          </div>
+          
+          <div className="p-4 grid grid-cols-3 gap-3">
+            <div className={`p-3 rounded-xl text-center ${analysis.hasMucus ? 'bg-orange-50 border border-orange-200' : 'bg-green-50 border border-green-200'}`}>
+              <i className={`fa-solid ${analysis.hasMucus ? 'fa-circle-exclamation text-orange-500' : 'fa-circle-check text-green-500'} text-lg mb-1`}></i>
+              <p className="text-[10px] font-bold text-gray-700">점액</p>
+              <p className={`text-[10px] ${analysis.hasMucus ? 'text-orange-600' : 'text-green-600'}`}>
+                {analysis.hasMucus ? '발견' : '없음'}
+              </p>
+            </div>
+            
+            <div className={`p-3 rounded-xl text-center ${analysis.hasBlood ? 'bg-red-50 border border-red-200' : 'bg-green-50 border border-green-200'}`}>
+              <i className={`fa-solid ${analysis.hasBlood ? 'fa-circle-exclamation text-red-500' : 'fa-circle-check text-green-500'} text-lg mb-1`}></i>
+              <p className="text-[10px] font-bold text-gray-700">혈액</p>
+              <p className={`text-[10px] ${analysis.hasBlood ? 'text-red-600' : 'text-green-600'}`}>
+                {analysis.hasBlood ? '발견' : '없음'}
+              </p>
+            </div>
+            
+            <div className={`p-3 rounded-xl text-center ${analysis.hasUndigested ? 'bg-yellow-50 border border-yellow-200' : 'bg-green-50 border border-green-200'}`}>
+              <i className={`fa-solid ${analysis.hasUndigested ? 'fa-circle-exclamation text-yellow-500' : 'fa-circle-check text-green-500'} text-lg mb-1`}></i>
+              <p className="text-[10px] font-bold text-gray-700">미소화</p>
+              <p className={`text-[10px] ${analysis.hasUndigested ? 'text-yellow-600' : 'text-green-600'}`}>
+                {analysis.hasUndigested ? '발견' : '없음'}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* 주의 사항 (있는 경우) */}
+        {analysis.warningSigns && analysis.warningSigns.length > 0 && (
+          <div className="bg-orange-50 rounded-2xl border border-orange-200 p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <i className="fa-solid fa-triangle-exclamation text-orange-500"></i>
+              <span className="text-sm font-bold text-orange-700">주의 관찰 사항</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {analysis.warningSigns.map((sign, idx) => (
+                <span key={idx} className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-medium">
+                  {sign}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* AI Insight Card */}
         <div className="bg-[#1E293B] text-white p-4 rounded-2xl relative overflow-hidden group">
