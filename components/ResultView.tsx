@@ -22,14 +22,24 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
   return (
     <div className="min-h-screen bg-[#FDFCFB] text-gray-900 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Header */}
-      <div className="sticky top-0 z-20 bg-white/80 backdrop-blur-md px-6 py-4 flex items-center border-b border-gray-100">
+      <div className="sticky top-0 z-20 bg-white/80 backdrop-blur-md px-4 py-4 flex items-center border-b border-gray-100">
         <button onClick={onReset} className="w-10 h-10 flex items-center justify-center -ml-2">
           <i className="fa-solid fa-arrow-left text-lg"></i>
         </button>
         <h1 className="flex-1 text-center font-bold text-lg -mr-8">AI 분석 결과</h1>
       </div>
 
-      <div className="p-6 space-y-8">
+      {/* Demo Disclaimer Banner */}
+      <div className="bg-amber-50 border-b border-amber-200 px-4 py-3">
+        <div className="flex items-center gap-2 text-amber-700">
+          <i className="fa-solid fa-flask text-sm"></i>
+          <p className="text-xs font-medium">
+            본 결과는 <span className="font-bold">데모용 임시 데이터</span>이며, 실제 AI 분석 결과가 아닙니다.
+          </p>
+        </div>
+      </div>
+
+      <div className="p-4 space-y-6">
         {/* Status Badge */}
         <div className="flex flex-col items-center gap-2">
           <div className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-2 ${getStatusColorClass(analysis.status)}`}>
