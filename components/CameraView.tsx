@@ -103,38 +103,8 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, captur
 
   return (
     <div className="fixed inset-0 bg-black flex flex-col safe-area-inset">
-      {/* Top Section: Header + Guide Message */}
-      {!isProcessing && (
-        <div className="shrink-0 z-10 flex flex-col" style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top, 0.75rem))' }}>
-          {/* Header */}
-          <div className="px-4 py-2 flex justify-between items-center">
-            <button className="w-10 h-10 rounded-full bg-black/30 flex items-center justify-center text-white backdrop-blur-md">
-              <i className="fa-solid fa-chevron-left"></i>
-            </button>
-            <div className="text-white font-semibold text-base tracking-tight backdrop-blur-md px-4 py-2 rounded-full bg-black/20">
-              푸스캔 AI
-            </div>
-            <button className="w-10 h-10 rounded-full bg-black/30 flex items-center justify-center text-white backdrop-blur-md">
-              <i className="fa-solid fa-question"></i>
-            </button>
-          </div>
-          
-          {/* Guide Message */}
-          <div className="px-4 py-2">
-            <div className="bg-blue-600/90 backdrop-blur-md rounded-xl p-3 flex items-center gap-3 shadow-lg border border-blue-400/30 max-w-sm mx-auto">
-              <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white shrink-0">
-                <i className="fa-solid fa-camera-retro text-sm"></i>
-              </div>
-              <p className="text-[12px] font-bold text-white leading-tight flex-1">
-                기저귀를 가이드라인 중앙에 맞춰 선명하게 촬영해 주세요
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Viewfinder */}
-      <div className="flex-1 relative flex items-center justify-center min-h-0">
+      {/* Viewfinder - 전체 화면 */}
+      <div className="flex-1 relative min-h-0">
         {isProcessing && capturedImage ? (
           // Blurred background image during processing
           <div className="absolute inset-0 w-full h-full">
@@ -163,13 +133,40 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, captur
           />
         )}
         
+        {/* Header Overlay */}
+        {!isProcessing && (
+          <div className="absolute top-0 left-0 right-0 z-10 px-4 flex justify-between items-center" style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top, 0.75rem))' }}>
+            <button className="w-9 h-9 rounded-full bg-black/40 flex items-center justify-center text-white backdrop-blur-md">
+              <i className="fa-solid fa-chevron-left text-sm"></i>
+            </button>
+            <div className="text-white font-semibold text-sm tracking-tight backdrop-blur-md px-3 py-1.5 rounded-full bg-black/30">
+              푸스캔 AI
+            </div>
+            <button className="w-9 h-9 rounded-full bg-black/40 flex items-center justify-center text-white backdrop-blur-md">
+              <i className="fa-solid fa-question text-sm"></i>
+            </button>
+          </div>
+        )}
+
+        {/* Guide Message Overlay */}
+        {!isProcessing && (
+          <div className="absolute top-16 left-0 right-0 z-10 px-4" style={{ marginTop: 'env(safe-area-inset-top, 0)' }}>
+            <div className="bg-blue-600/80 backdrop-blur-md rounded-lg px-3 py-2 flex items-center gap-2 shadow-lg max-w-xs mx-auto">
+              <i className="fa-solid fa-camera-retro text-white text-xs"></i>
+              <p className="text-[11px] font-medium text-white leading-tight">
+                기저귀를 중앙에 맞춰 촬영해 주세요
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Guide Lines & Scan Animation */}
-        <div className="absolute inset-0 pointer-events-none flex items-center justify-center p-8">
-          <div className={`w-full max-w-[260px] aspect-square border-2 ${isProcessing ? 'border-blue-500/50' : 'border-white/40'} rounded-3xl relative transition-colors duration-500`}>
-            <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-blue-500 rounded-tl-2xl"></div>
-            <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-blue-500 rounded-tr-2xl"></div>
-            <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-blue-500 rounded-bl-2xl"></div>
-            <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-blue-500 rounded-br-2xl"></div>
+        <div className="absolute inset-0 pointer-events-none flex items-center justify-center p-4">
+          <div className={`w-[85%] max-w-[320px] aspect-[3/4] border-2 ${isProcessing ? 'border-blue-500/50' : 'border-white/50'} rounded-3xl relative transition-colors duration-500`}>
+            <div className="absolute top-0 left-0 w-10 h-10 border-t-4 border-l-4 border-blue-500 rounded-tl-2xl"></div>
+            <div className="absolute top-0 right-0 w-10 h-10 border-t-4 border-r-4 border-blue-500 rounded-tr-2xl"></div>
+            <div className="absolute bottom-0 left-0 w-10 h-10 border-b-4 border-l-4 border-blue-500 rounded-bl-2xl"></div>
+            <div className="absolute bottom-0 right-0 w-10 h-10 border-b-4 border-r-4 border-blue-500 rounded-br-2xl"></div>
             
             {isProcessing && (
               <div className="scan-line absolute w-full rounded-full"></div>
@@ -179,18 +176,8 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, captur
       </div>
 
       {/* Bottom Controls */}
-      <div className={`shrink-0 bg-black/70 backdrop-blur-2xl px-4 pt-3 flex flex-col items-center gap-3 border-t border-white/10 transition-opacity duration-500 ${isProcessing ? 'opacity-30 pointer-events-none' : 'opacity-100'}`} style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 1rem))' }}>
-        <div className="w-full flex items-center justify-between text-white/50 px-2">
-           <div className="flex flex-col items-center">
-              <p className="text-[9px] uppercase font-bold mb-1 tracking-tighter">AI Precision Mode</p>
-              <div className="h-1 w-20 bg-white/20 rounded-full overflow-hidden">
-                <div className="h-full w-2/3 bg-blue-500"></div>
-              </div>
-           </div>
-           <div className="text-[10px] font-bold text-white/80 tracking-widest uppercase">Ready to Scan</div>
-        </div>
-
-        <div className="flex items-center justify-around w-full max-w-xs pb-1">
+      <div className={`shrink-0 bg-gradient-to-t from-black/90 to-black/40 px-4 pt-2 flex flex-col items-center gap-2 transition-opacity duration-500 ${isProcessing ? 'opacity-30 pointer-events-none' : 'opacity-100'}`} style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom, 0.75rem))' }}>
+        <div className="flex items-center justify-around w-full max-w-xs">
           <button 
             onClick={toggleFlash}
             disabled={!isFlashSupported}
