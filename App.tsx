@@ -39,7 +39,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="h-screen w-full max-w-lg mx-auto md:shadow-2xl relative bg-black flex flex-col overflow-hidden">
+    <div className="h-screen w-full sm:max-w-lg sm:mx-auto md:shadow-2xl relative bg-black flex flex-col overflow-hidden">
       {state.view === 'camera' && (
         <CameraView 
           onCapture={handleCapture} 
