@@ -102,7 +102,7 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, captur
   };
 
   return (
-    <div className="relative h-full w-full bg-black overflow-hidden flex flex-col safe-area-inset">
+    <div className="fixed inset-0 bg-black flex flex-col safe-area-inset">
       {/* Header Overlays */}
       {!isProcessing && (
         <div className="absolute top-0 left-0 right-0 z-10 p-4 pt-[max(1rem,env(safe-area-inset-top))] flex justify-between items-start pointer-events-none">
@@ -180,28 +180,28 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, captur
       </div>
 
       {/* Bottom Controls */}
-      <div className={`bg-black/40 backdrop-blur-2xl p-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] flex flex-col items-center gap-4 border-t border-white/10 transition-opacity duration-500 ${isProcessing ? 'opacity-30 pointer-events-none' : 'opacity-100'}`}>
+      <div className={`shrink-0 bg-black/70 backdrop-blur-2xl px-4 pt-3 flex flex-col items-center gap-3 border-t border-white/10 transition-opacity duration-500 ${isProcessing ? 'opacity-30 pointer-events-none' : 'opacity-100'}`} style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 1rem))' }}>
         <div className="w-full flex items-center justify-between text-white/50 px-2">
            <div className="flex flex-col items-center">
               <p className="text-[9px] uppercase font-bold mb-1 tracking-tighter">AI Precision Mode</p>
-              <div className="h-1 w-24 bg-white/20 rounded-full overflow-hidden">
+              <div className="h-1 w-20 bg-white/20 rounded-full overflow-hidden">
                 <div className="h-full w-2/3 bg-blue-500"></div>
               </div>
            </div>
            <div className="text-[10px] font-bold text-white/80 tracking-widest uppercase">Ready to Scan</div>
         </div>
 
-        <div className="flex items-center justify-around w-full max-w-xs">
+        <div className="flex items-center justify-around w-full max-w-xs pb-1">
           <button 
             onClick={toggleFlash}
             disabled={!isFlashSupported}
-            className="flex flex-col items-center gap-2"
+            className="flex flex-col items-center gap-1"
           >
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${
+            <div className={`w-11 h-11 rounded-full flex items-center justify-center transition-colors ${
               isFlashOn 
                 ? 'bg-yellow-400 text-black' 
                 : isFlashSupported 
-                  ? 'bg-white/5 text-white/80' 
+                  ? 'bg-white/10 text-white/80' 
                   : 'bg-white/5 text-white/30'
             }`}>
               <i className={`fa-solid ${isFlashOn ? 'fa-bolt-lightning' : 'fa-bolt'}`}></i>
@@ -209,23 +209,23 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, captur
             <span className={`text-[10px] font-medium ${
               isFlashOn ? 'text-yellow-400' : 'text-white/60'
             }`}>
-              {isFlashOn ? '플래시 켜짐' : '플래시'}
+              {isFlashOn ? 'ON' : '플래시'}
             </span>
           </button>
 
           <button 
             onClick={handleCapture}
             disabled={isProcessing}
-            className="group relative w-20 h-20 flex items-center justify-center active:scale-95 transition-transform disabled:opacity-50"
+            className="group relative w-[72px] h-[72px] flex items-center justify-center active:scale-95 transition-transform disabled:opacity-50"
           >
             <div className="absolute inset-0 rounded-full border-2 border-white/30 group-hover:border-white/50 transition-colors"></div>
-            <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center shadow-lg">
-               <div className="w-14 h-14 rounded-full border-2 border-gray-100"></div>
+            <div className="w-[60px] h-[60px] rounded-full bg-white flex items-center justify-center shadow-lg">
+               <div className="w-[52px] h-[52px] rounded-full border-2 border-gray-100"></div>
             </div>
           </button>
 
-          <label className="flex flex-col items-center gap-2 cursor-pointer group">
-            <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-white/80 group-hover:bg-white/10 transition-colors">
+          <label className="flex flex-col items-center gap-1 cursor-pointer group">
+            <div className="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center text-white/80 group-hover:bg-white/20 transition-colors">
               <i className="fa-solid fa-images"></i>
             </div>
             <span className="text-[10px] text-white/60 font-medium">앨범</span>
