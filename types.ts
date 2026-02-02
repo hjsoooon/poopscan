@@ -1,5 +1,4 @@
-
-export type AnalysisStatus = 'normal' | 'caution' | 'warning' | 'emergency';
+export type AnalysisStatus = 'normal' | 'caution' | 'warning' | 'emergency' | 'invalid';
 
 export interface PoopAnalysisResult {
   status: AnalysisStatus;

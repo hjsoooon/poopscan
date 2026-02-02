@@ -15,9 +15,67 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
       case 'caution': return 'bg-orange-100 text-orange-700';
       case 'warning': return 'bg-red-100 text-red-700';
       case 'emergency': return 'bg-black text-white';
+      case 'invalid': return 'bg-gray-100 text-gray-700';
       default: return 'bg-gray-100 text-gray-700';
     }
   };
+
+  // 기저귀가 아닌 경우 별도 UI
+  if (analysis.status === 'invalid') {
+    return (
+      <div className="min-h-screen min-h-[100dvh] bg-[#FDFCFB] text-gray-900 pb-[max(5rem,env(safe-area-inset-bottom))] flex flex-col">
+        {/* Header */}
+        <div className="sticky top-0 z-20 bg-white/80 backdrop-blur-md px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] flex items-center border-b border-gray-100">
+          <button onClick={onReset} className="w-10 h-10 flex items-center justify-center -ml-2">
+            <i className="fa-solid fa-arrow-left text-lg"></i>
+          </button>
+          <h1 className="flex-1 text-center font-bold text-lg -mr-8">AI 분석 결과</h1>
+        </div>
+
+        <div className="flex-1 flex flex-col items-center justify-center p-6">
+          {/* Error Icon */}
+          <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-6">
+            <i className="fa-solid fa-image text-4xl text-gray-400"></i>
+          </div>
+          
+          {/* Error Message */}
+          <h2 className="text-2xl font-bold text-gray-800 mb-2 text-center">기저귀 사진이 아니에요</h2>
+          <p className="text-gray-500 text-center mb-8 leading-relaxed">
+            기저귀 사진을 업로드해 주세요.<br/>
+            배변이 보이는 기저귀를 선명하게 촬영해 주시면<br/>
+            더 정확한 분석이 가능합니다.
+          </p>
+
+          {/* Uploaded Image Preview */}
+          <div className="w-32 h-32 rounded-2xl overflow-hidden border-2 border-gray-200 mb-8">
+            <img src={image} className="w-full h-full object-cover" alt="Uploaded" />
+          </div>
+
+          {/* Tips */}
+          <div className="bg-blue-50 rounded-2xl p-4 w-full max-w-sm mb-8">
+            <div className="flex items-center gap-2 mb-2">
+              <i className="fa-solid fa-lightbulb text-blue-500"></i>
+              <span className="text-sm font-bold text-blue-700">촬영 팁</span>
+            </div>
+            <ul className="text-sm text-blue-600 space-y-1">
+              <li>• 밝은 곳에서 촬영해 주세요</li>
+              <li>• 배변 부분이 잘 보이게 촬영해 주세요</li>
+              <li>• 기저귀 전체가 프레임에 들어오게 해주세요</li>
+            </ul>
+          </div>
+
+          {/* Retry Button */}
+          <button 
+            onClick={onReset}
+            className="w-full max-w-sm h-14 bg-[#F97316] text-white rounded-xl font-bold text-base shadow-lg shadow-orange-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+          >
+            <i className="fa-solid fa-camera"></i>
+            다시 촬영하기
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen min-h-[100dvh] bg-[#FDFCFB] text-gray-900 pb-[max(5rem,env(safe-area-inset-bottom))] animate-in fade-in slide-in-from-bottom-4 duration-500">

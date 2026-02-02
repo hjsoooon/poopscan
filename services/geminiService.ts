@@ -70,9 +70,27 @@ const mockResults: PoopAnalysisResult[] = [
   }
 ];
 
+// 기저귀가 아닌 경우 결과
+const invalidResult: PoopAnalysisResult = {
+  status: 'invalid',
+  statusLabel: '인식 불가',
+  description: '기저귀 사진이 아닙니다.',
+  color: '-',
+  colorHex: '#CCCCCC',
+  consistency: '-',
+  frequencyToday: 0,
+  insight: '기저귀 사진을 업로드해 주세요. 배변이 보이는 기저귀를 선명하게 촬영해 주시면 더 정확한 분석이 가능합니다.',
+  recommendations: ['기저귀 사진 다시 촬영', '밝은 곳에서 촬영', '배변 부분이 잘 보이게 촬영']
+};
+
 export async function analyzePoopImage(base64Image: string): Promise<PoopAnalysisResult> {
   // 분석하는 것처럼 1~2초 딜레이
   await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 1000));
+  
+  // 15% 확률로 "기저귀가 아님" 결과 반환 (데모용)
+  if (Math.random() < 0.15) {
+    return invalidResult;
+  }
   
   // 랜덤 결과 반환
   const randomIndex = Math.floor(Math.random() * mockResults.length);
