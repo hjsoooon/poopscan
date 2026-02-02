@@ -9,7 +9,10 @@ interface CameraViewProps {
 
 const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, capturedImage }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+  const [isFlashOn, setIsFlashOn] = useState(false);
+  const [isFlashSupported, setIsFlashSupported] = useState(false);
 
   useEffect(() => {
     if (isProcessing) return; // Don't restart camera if we are processing
@@ -20,9 +23,22 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, captur
           video: { facingMode: 'environment' },
           audio: false 
         });
+        
+        streamRef.current = stream;
+        
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
         }
+        
+        // 플래시(토치) 지원 여부 확인
+        const track = stream.getVideoTracks()[0];
+        if (track) {
+          const capabilities = track.getCapabilities?.() as MediaTrackCapabilities & { torch?: boolean };
+          if (capabilities?.torch) {
+            setIsFlashSupported(true);
+          }
+        }
+        
         setHasPermission(true);
       } catch (err) {
         console.error("Camera access denied", err);
@@ -32,12 +48,31 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, captur
     setupCamera();
     
     return () => {
-      if (videoRef.current && videoRef.current.srcObject) {
-        const stream = videoRef.current.srcObject as MediaStream;
-        stream.getTracks().forEach(track => track.stop());
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current = null;
       }
+      setIsFlashOn(false);
     };
   }, [isProcessing]);
+
+  // 플래시 토글
+  const toggleFlash = async () => {
+    if (!streamRef.current || !isFlashSupported) return;
+    
+    const track = streamRef.current.getVideoTracks()[0];
+    if (!track) return;
+    
+    try {
+      const newFlashState = !isFlashOn;
+      await track.applyConstraints({
+        advanced: [{ torch: newFlashState } as MediaTrackConstraintSet]
+      });
+      setIsFlashOn(newFlashState);
+    } catch (err) {
+      console.error("Flash toggle failed:", err);
+    }
+  };
 
   const handleCapture = () => {
     if (!videoRef.current) return;
@@ -157,11 +192,25 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, captur
         </div>
 
         <div className="flex items-center justify-around w-full max-w-xs">
-          <button className="flex flex-col items-center gap-2">
-            <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-white/80">
-              <i className="fa-solid fa-bolt"></i>
+          <button 
+            onClick={toggleFlash}
+            disabled={!isFlashSupported}
+            className="flex flex-col items-center gap-2"
+          >
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${
+              isFlashOn 
+                ? 'bg-yellow-400 text-black' 
+                : isFlashSupported 
+                  ? 'bg-white/5 text-white/80' 
+                  : 'bg-white/5 text-white/30'
+            }`}>
+              <i className={`fa-solid ${isFlashOn ? 'fa-bolt-lightning' : 'fa-bolt'}`}></i>
             </div>
-            <span className="text-[10px] text-white/60 font-medium">플래시</span>
+            <span className={`text-[10px] font-medium ${
+              isFlashOn ? 'text-yellow-400' : 'text-white/60'
+            }`}>
+              {isFlashOn ? '플래시 켜짐' : '플래시'}
+            </span>
           </button>
 
           <button 
