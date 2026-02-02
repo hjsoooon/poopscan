@@ -186,8 +186,19 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, captur
       </div>
 
       {isProcessing && (
-        <div className="absolute inset-0 bg-black/40 z-50 flex flex-col items-center justify-center text-white backdrop-blur-[2px]">
-           <div className="relative w-24 h-24 mb-8">
+        <div className="fixed inset-0 bg-black/60 z-50 flex flex-col items-center justify-center text-white backdrop-blur-sm">
+           {/* Background captured image */}
+           {capturedImage && (
+             <div className="absolute inset-0 -z-10">
+               <img 
+                 src={capturedImage} 
+                 className="w-full h-full object-cover blur-xl scale-110 opacity-50"
+                 alt="Analyzing backdrop"
+               />
+             </div>
+           )}
+           
+           <div className="relative w-20 h-20 mb-6">
               <div className="absolute inset-0 border-4 border-white/10 rounded-full"></div>
               <div className="absolute inset-0 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
               <div className="absolute inset-0 flex items-center justify-center">
@@ -195,10 +206,10 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, captur
               </div>
            </div>
            <h2 className="text-xl font-bold mb-2 tracking-tight">AI 정밀 분석 중</h2>
-           <p className="text-white/70 text-sm">기저귀의 색상과 제형을 확인하고 있어요</p>
+           <p className="text-white/70 text-sm text-center px-4">기저귀의 색상과 제형을 확인하고 있어요</p>
            
            {/* Mini Preview of Captured Image */}
-           <div className="mt-12 w-20 h-20 rounded-2xl border-2 border-white/20 overflow-hidden shadow-2xl animate-bounce-slow">
+           <div className="mt-8 w-16 h-16 rounded-xl border-2 border-white/30 overflow-hidden shadow-2xl">
               <img src={capturedImage || ''} className="w-full h-full object-cover" alt="Captured" />
            </div>
         </div>
