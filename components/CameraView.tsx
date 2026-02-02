@@ -67,10 +67,10 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, captur
   };
 
   return (
-    <div className="relative h-full w-full bg-black overflow-hidden flex flex-col">
+    <div className="relative h-full w-full bg-black overflow-hidden flex flex-col safe-area-inset">
       {/* Header Overlays */}
       {!isProcessing && (
-        <div className="absolute top-0 left-0 right-0 z-10 p-6 flex justify-between items-start pointer-events-none">
+        <div className="absolute top-0 left-0 right-0 z-10 p-4 pt-[max(1rem,env(safe-area-inset-top))] flex justify-between items-start pointer-events-none">
           <button className="w-10 h-10 rounded-full bg-black/30 flex items-center justify-center text-white backdrop-blur-md pointer-events-auto">
             <i className="fa-solid fa-chevron-left"></i>
           </button>
@@ -130,12 +130,12 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, captur
         )}
         
         {/* Guide Lines & Scan Animation */}
-        <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-          <div className={`w-[80vw] h-[80vw] border-2 ${isProcessing ? 'border-blue-500/50' : 'border-white/30'} rounded-3xl relative transition-colors duration-500`}>
-            <div className="absolute top-0 left-0 w-10 h-10 border-t-4 border-l-4 border-blue-500 rounded-tl-2xl"></div>
-            <div className="absolute top-0 right-0 w-10 h-10 border-t-4 border-r-4 border-blue-500 rounded-tr-2xl"></div>
-            <div className="absolute bottom-0 left-0 w-10 h-10 border-b-4 border-l-4 border-blue-500 rounded-bl-2xl"></div>
-            <div className="absolute bottom-0 right-0 w-10 h-10 border-b-4 border-r-4 border-blue-500 rounded-br-2xl"></div>
+        <div className="absolute inset-0 pointer-events-none flex items-center justify-center px-6">
+          <div className={`w-full max-w-[280px] aspect-square border-2 ${isProcessing ? 'border-blue-500/50' : 'border-white/30'} rounded-3xl relative transition-colors duration-500`}>
+            <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-blue-500 rounded-tl-2xl"></div>
+            <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-blue-500 rounded-tr-2xl"></div>
+            <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-blue-500 rounded-bl-2xl"></div>
+            <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-blue-500 rounded-br-2xl"></div>
             
             {(isProcessing || true) && (
               <div className={`scan-line absolute w-full rounded-full ${!isProcessing && 'hidden'}`}></div>
@@ -145,8 +145,8 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, captur
       </div>
 
       {/* Bottom Controls */}
-      <div className={`bg-black/40 backdrop-blur-2xl p-8 flex flex-col items-center gap-6 pb-12 border-t border-white/10 transition-opacity duration-500 ${isProcessing ? 'opacity-30 pointer-events-none' : 'opacity-100'}`}>
-        <div className="w-full flex items-center justify-between text-white/50 px-4">
+      <div className={`bg-black/40 backdrop-blur-2xl p-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] flex flex-col items-center gap-4 border-t border-white/10 transition-opacity duration-500 ${isProcessing ? 'opacity-30 pointer-events-none' : 'opacity-100'}`}>
+        <div className="w-full flex items-center justify-between text-white/50 px-2">
            <div className="flex flex-col items-center">
               <p className="text-[9px] uppercase font-bold mb-1 tracking-tighter">AI Precision Mode</p>
               <div className="h-1 w-24 bg-white/20 rounded-full overflow-hidden">

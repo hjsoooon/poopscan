@@ -2,10 +2,27 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap');
 
+/* Mobile viewport fix */
+html {
+  height: -webkit-fill-available;
+}
+
 body {
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
   -webkit-tap-highlight-color: transparent;
   background-color: #F8F9FA;
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+/* Safe area support for notched phones */
+@supports (padding: max(0px)) {
+  .safe-area-inset {
+    padding-left: max(0px, env(safe-area-inset-left));
+    padding-right: max(0px, env(safe-area-inset-right));
+  }
 }
 
 .glass-panel {
