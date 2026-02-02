@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { PoopAnalysisResult } from '../types';
 
 interface ResultViewProps {
@@ -9,6 +8,109 @@ interface ResultViewProps {
 }
 
 const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => {
+  const [isSaving, setIsSaving] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
+
+  // 이미지 저장 기능
+  const handleSaveImage = async () => {
+    setIsSaving(true);
+    try {
+      // 이미지를 Blob으로 변환
+      const response = await fetch(image);
+      const blob = await response.blob();
+      
+      // 파일명 생성
+      const timestamp = new Date().toISOString().slice(0, 10);
+      const filename = `poopscan_${timestamp}_${analysis.statusLabel}.jpg`;
+
+      // 모바일에서 공유 API를 통한 저장 시도
+      if (navigator.share && navigator.canShare) {
+        const file = new File([blob], filename, { type: 'image/jpeg' });
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: 'PoopScan AI 분석 결과',
+          });
+          setIsSaving(false);
+          return;
+        }
+      }
+
+      // 폴백: 다운로드 링크 생성
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      alert('이미지가 저장되었습니다!');
+    } catch (error) {
+      console.error('Save failed:', error);
+      alert('저장에 실패했습니다. 다시 시도해 주세요.');
+    }
+    setIsSaving(false);
+  };
+
+  // 공유 기능
+  const handleShare = async () => {
+    setIsSharing(true);
+    
+    const shareText = `🔍 PoopScan AI 분석 결과
+
+📊 상태: ${analysis.statusLabel}
+🎨 색상: ${analysis.color}
+💧 제형: ${analysis.consistency}
+📝 오늘 ${analysis.frequencyToday}번째
+
+💡 AI 가이드:
+"${analysis.insight}"
+
+⚠️ 본 결과는 참고용이며, 정확한 진단은 전문의와 상담하세요.`;
+
+    try {
+      // Web Share API 지원 확인
+      if (navigator.share) {
+        // 이미지와 함께 공유 시도
+        const response = await fetch(image);
+        const blob = await response.blob();
+        const file = new File([blob], 'poopscan_result.jpg', { type: 'image/jpeg' });
+        
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            title: 'PoopScan AI 분석 결과',
+            text: shareText,
+            files: [file],
+          });
+        } else {
+          // 이미지 없이 텍스트만 공유
+          await navigator.share({
+            title: 'PoopScan AI 분석 결과',
+            text: shareText,
+          });
+        }
+      } else {
+        // Web Share API 미지원시 클립보드 복사
+        await navigator.clipboard.writeText(shareText);
+        alert('분석 결과가 클립보드에 복사되었습니다!');
+      }
+    } catch (error) {
+      if ((error as Error).name !== 'AbortError') {
+        console.error('Share failed:', error);
+        // 폴백: 클립보드 복사
+        try {
+          await navigator.clipboard.writeText(shareText);
+          alert('분석 결과가 클립보드에 복사되었습니다!');
+        } catch {
+          alert('공유에 실패했습니다.');
+        }
+      }
+    }
+    setIsSharing(false);
+  };
+
   const getStatusColorClass = (status: string) => {
     switch(status) {
       case 'normal': return 'bg-green-100 text-green-700';
@@ -202,13 +304,39 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
 
         {/* Action Buttons */}
         <div className="space-y-3 pt-2">
-           <button className="w-full h-14 bg-[#F97316] text-white rounded-xl font-bold text-base shadow-lg shadow-orange-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-             <i className="fa-solid fa-floppy-disk"></i>
-             기록 저장하기
+           <button 
+             onClick={handleSaveImage}
+             disabled={isSaving}
+             className="w-full h-14 bg-[#F97316] text-white rounded-xl font-bold text-base shadow-lg shadow-orange-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+           >
+             {isSaving ? (
+               <>
+                 <i className="fa-solid fa-spinner animate-spin"></i>
+                 저장 중...
+               </>
+             ) : (
+               <>
+                 <i className="fa-solid fa-download"></i>
+                 사진 저장하기
+               </>
+             )}
            </button>
-           <button className="w-full h-14 bg-white border border-gray-100 text-[#F97316] rounded-xl font-bold text-base active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-             <i className="fa-solid fa-share-nodes"></i>
-             의사에게 공유하기
+           <button 
+             onClick={handleShare}
+             disabled={isSharing}
+             className="w-full h-14 bg-white border border-gray-100 text-[#F97316] rounded-xl font-bold text-base active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+           >
+             {isSharing ? (
+               <>
+                 <i className="fa-solid fa-spinner animate-spin"></i>
+                 공유 준비 중...
+               </>
+             ) : (
+               <>
+                 <i className="fa-solid fa-share-nodes"></i>
+                 공유하기
+               </>
+             )}
            </button>
            
            <div className="text-center pt-4">
