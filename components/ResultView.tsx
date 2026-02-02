@@ -213,27 +213,21 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
     
     try {
       const blob = await createResultImage();
-      const file = new File([blob], 'poopscan_result.jpg', { type: 'image/jpeg' });
+      const timestamp = new Date().toISOString().slice(0, 10);
+      const filename = `poopscan_${timestamp}_${analysis.statusLabel}.jpg`;
+      const file = new File([blob], filename, { type: 'image/jpeg' });
 
-      // Web Share API 지원 확인
+      // Web Share API로 이미지 공유
       if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({
           files: [file],
-          title: 'PoopScan AI 분석 결과',
-        });
-      } else if (navigator.share) {
-        // 이미지 없이 텍스트만 공유
-        const shareText = `🔍 PoopScan AI 분석 결과\n\n📊 상태: ${analysis.statusLabel}\n🎨 색상: ${analysis.color}\n💧 제형: ${analysis.consistency}\n📦 양: ${analysis.amount}\n💦 수분 상태: ${analysis.hydration}\n📝 오늘 ${analysis.frequencyToday}번째\n\n💡 AI 가이드:\n"${analysis.insight}"\n\n⚠️ 본 결과는 참고용이며, 정확한 진단은 전문의와 상담하세요.`;
-        await navigator.share({
-          title: 'PoopScan AI 분석 결과',
-          text: shareText,
         });
       } else {
         // 폴백: 다운로드
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = 'poopscan_result.jpg';
+        link.download = filename;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
