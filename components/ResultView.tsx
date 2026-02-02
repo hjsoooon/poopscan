@@ -11,15 +11,168 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
   const [isSaving, setIsSaving] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
 
+  // 분석 결과가 포함된 이미지 생성
+  const createResultImage = async (): Promise<Blob> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          reject(new Error('Canvas context not available'));
+          return;
+        }
+
+        // 캔버스 크기 설정 (이미지 + 하단 정보 영역)
+        const imgWidth = Math.min(img.width, 1080);
+        const imgHeight = (img.height / img.width) * imgWidth;
+        const infoHeight = 320;
+        
+        canvas.width = imgWidth;
+        canvas.height = imgHeight + infoHeight;
+
+        // 배경색
+        ctx.fillStyle = '#FDFCFB';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // 원본 이미지 그리기
+        ctx.drawImage(img, 0, 0, imgWidth, imgHeight);
+
+        // 이미지 위에 상태 배지
+        const statusColors: Record<string, string> = {
+          normal: '#22C55E',
+          caution: '#F97316',
+          warning: '#EF4444',
+          emergency: '#000000'
+        };
+        const statusBgColors: Record<string, string> = {
+          normal: '#DCFCE7',
+          caution: '#FED7AA',
+          warning: '#FECACA',
+          emergency: '#374151'
+        };
+        
+        ctx.fillStyle = statusBgColors[analysis.status] || '#F3F4F6';
+        ctx.beginPath();
+        ctx.roundRect(imgWidth / 2 - 60, 20, 120, 36, 18);
+        ctx.fill();
+        
+        ctx.fillStyle = statusColors[analysis.status] || '#374151';
+        ctx.font = 'bold 16px Pretendard, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(analysis.statusLabel, imgWidth / 2, 45);
+
+        // 하단 정보 영역 시작 위치
+        const infoY = imgHeight + 20;
+        ctx.textAlign = 'left';
+
+        // 앱 로고/타이틀
+        ctx.fillStyle = '#1E293B';
+        ctx.font = 'bold 24px Pretendard, sans-serif';
+        ctx.fillText('🔍 PoopScan AI 분석 결과', 24, infoY + 10);
+        
+        // 분석 시간
+        ctx.fillStyle = '#9CA3AF';
+        ctx.font = '14px Pretendard, sans-serif';
+        ctx.fillText(analysis.analysisTime, 24, infoY + 35);
+
+        // 구분선
+        ctx.strokeStyle = '#E5E7EB';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(24, infoY + 50);
+        ctx.lineTo(imgWidth - 24, infoY + 50);
+        ctx.stroke();
+
+        // 분석 결과 그리드
+        const gridY = infoY + 70;
+        const colWidth = (imgWidth - 48) / 3;
+        
+        const items = [
+          { label: '색상', value: analysis.color, color: analysis.colorHex },
+          { label: '제형', value: analysis.consistency },
+          { label: '양', value: analysis.amount },
+          { label: '횟수', value: `${analysis.frequencyToday}회` },
+          { label: '수분상태', value: analysis.hydration },
+          { label: '브리스톨', value: `Type ${analysis.bristolType}` }
+        ];
+
+        items.forEach((item, idx) => {
+          const col = idx % 3;
+          const row = Math.floor(idx / 3);
+          const x = 24 + col * colWidth;
+          const y = gridY + row * 55;
+          
+          ctx.fillStyle = '#9CA3AF';
+          ctx.font = '12px Pretendard, sans-serif';
+          ctx.fillText(item.label, x, y);
+          
+          ctx.fillStyle = '#1E293B';
+          ctx.font = 'bold 16px Pretendard, sans-serif';
+          ctx.fillText(item.value, x, y + 22);
+          
+          if (item.color) {
+            ctx.fillStyle = item.color;
+            ctx.beginPath();
+            ctx.arc(x + ctx.measureText(item.value).width + 15, y + 16, 8, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        });
+
+        // AI 인사이트
+        const insightY = gridY + 130;
+        ctx.fillStyle = '#1E293B';
+        ctx.font = 'bold 14px Pretendard, sans-serif';
+        ctx.fillText('💡 AI 가이드', 24, insightY);
+        
+        ctx.fillStyle = '#4B5563';
+        ctx.font = '13px Pretendard, sans-serif';
+        
+        // 텍스트 줄바꿈 처리
+        const maxWidth = imgWidth - 48;
+        const words = analysis.insight.split(' ');
+        let line = '';
+        let lineY = insightY + 22;
+        
+        for (const word of words) {
+          const testLine = line + word + ' ';
+          if (ctx.measureText(testLine).width > maxWidth && line !== '') {
+            ctx.fillText(line.trim(), 24, lineY);
+            line = word + ' ';
+            lineY += 18;
+            if (lineY > insightY + 60) break;
+          } else {
+            line = testLine;
+          }
+        }
+        if (lineY <= insightY + 60) {
+          ctx.fillText(line.trim(), 24, lineY);
+        }
+
+        // 면책 조항
+        ctx.fillStyle = '#9CA3AF';
+        ctx.font = '10px Pretendard, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('⚠️ 본 결과는 참고용이며, 정확한 진단은 전문의와 상담하세요.', imgWidth / 2, canvas.height - 15);
+
+        // Blob으로 변환
+        canvas.toBlob((blob) => {
+          if (blob) resolve(blob);
+          else reject(new Error('Failed to create blob'));
+        }, 'image/jpeg', 0.9);
+      };
+      
+      img.onerror = () => reject(new Error('Failed to load image'));
+      img.src = image;
+    });
+  };
+
   // 이미지 저장 기능
   const handleSaveImage = async () => {
     setIsSaving(true);
     try {
-      // 이미지를 Blob으로 변환
-      const response = await fetch(image);
-      const blob = await response.blob();
-      
-      // 파일명 생성
+      const blob = await createResultImage();
       const timestamp = new Date().toISOString().slice(0, 10);
       const filename = `poopscan_${timestamp}_${analysis.statusLabel}.jpg`;
 
@@ -46,7 +199,7 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
       
-      alert('이미지가 저장되었습니다!');
+      alert('분석 결과 이미지가 저장되었습니다!');
     } catch (error) {
       console.error('Save failed:', error);
       alert('저장에 실패했습니다. 다시 시도해 주세요.');
@@ -58,56 +211,39 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
   const handleShare = async () => {
     setIsSharing(true);
     
-    const shareText = `🔍 PoopScan AI 분석 결과
-
-📊 상태: ${analysis.statusLabel}
-🎨 색상: ${analysis.color}
-💧 제형: ${analysis.consistency}
-📦 양: ${analysis.amount}
-💦 수분 상태: ${analysis.hydration}
-📝 오늘 ${analysis.frequencyToday}번째
-
-💡 AI 가이드:
-"${analysis.insight}"
-
-⚠️ 본 결과는 참고용이며, 정확한 진단은 전문의와 상담하세요.`;
-
     try {
+      const blob = await createResultImage();
+      const file = new File([blob], 'poopscan_result.jpg', { type: 'image/jpeg' });
+
       // Web Share API 지원 확인
-      if (navigator.share) {
-        // 이미지와 함께 공유 시도
-        const response = await fetch(image);
-        const blob = await response.blob();
-        const file = new File([blob], 'poopscan_result.jpg', { type: 'image/jpeg' });
-        
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share({
-            title: 'PoopScan AI 분석 결과',
-            text: shareText,
-            files: [file],
-          });
-        } else {
-          // 이미지 없이 텍스트만 공유
-          await navigator.share({
-            title: 'PoopScan AI 분석 결과',
-            text: shareText,
-          });
-        }
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: 'PoopScan AI 분석 결과',
+        });
+      } else if (navigator.share) {
+        // 이미지 없이 텍스트만 공유
+        const shareText = `🔍 PoopScan AI 분석 결과\n\n📊 상태: ${analysis.statusLabel}\n🎨 색상: ${analysis.color}\n💧 제형: ${analysis.consistency}\n📦 양: ${analysis.amount}\n💦 수분 상태: ${analysis.hydration}\n📝 오늘 ${analysis.frequencyToday}번째\n\n💡 AI 가이드:\n"${analysis.insight}"\n\n⚠️ 본 결과는 참고용이며, 정확한 진단은 전문의와 상담하세요.`;
+        await navigator.share({
+          title: 'PoopScan AI 분석 결과',
+          text: shareText,
+        });
       } else {
-        // Web Share API 미지원시 클립보드 복사
-        await navigator.clipboard.writeText(shareText);
-        alert('분석 결과가 클립보드에 복사되었습니다!');
+        // 폴백: 다운로드
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'poopscan_result.jpg';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        alert('분석 결과 이미지가 다운로드되었습니다!');
       }
     } catch (error) {
       if ((error as Error).name !== 'AbortError') {
         console.error('Share failed:', error);
-        // 폴백: 클립보드 복사
-        try {
-          await navigator.clipboard.writeText(shareText);
-          alert('분석 결과가 클립보드에 복사되었습니다!');
-        } catch {
-          alert('공유에 실패했습니다.');
-        }
+        alert('공유에 실패했습니다. 다시 시도해 주세요.');
       }
     }
     setIsSharing(false);
