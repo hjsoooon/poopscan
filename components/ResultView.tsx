@@ -64,7 +64,6 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
 🎨 색상: ${analysis.color}
 💧 제형: ${analysis.consistency}
 📦 양: ${analysis.amount}
-👃 냄새: ${analysis.smell}
 💦 수분 상태: ${analysis.hydration}
 📝 오늘 ${analysis.frequencyToday}번째
 
@@ -295,19 +294,6 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
                 <span className="text-sm text-gray-600">오늘 배변 횟수</span>
               </div>
               <span className="text-sm font-bold">{analysis.frequencyToday}회</span>
-            </div>
-            
-            {/* 냄새 */}
-            <div className="px-4 py-3 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                  <i className="fa-solid fa-wind text-green-600 text-sm"></i>
-                </div>
-                <span className="text-sm text-gray-600">냄새</span>
-              </div>
-              <span className={`text-sm font-bold ${analysis.smell === '악취' || analysis.smell === '시큼함' ? 'text-orange-500' : 'text-gray-800'}`}>
-                {analysis.smell}
-              </span>
             </div>
             
             {/* 수분 상태 */}
