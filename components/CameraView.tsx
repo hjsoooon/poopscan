@@ -13,6 +13,7 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, captur
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [isFlashOn, setIsFlashOn] = useState(false);
   const [isFlashSupported, setIsFlashSupported] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
 
   useEffect(() => {
     if (isProcessing) return; // Don't restart camera if we are processing
@@ -142,7 +143,10 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, captur
             <div className="text-white font-semibold text-sm tracking-tight backdrop-blur-md px-3 py-1.5 rounded-full bg-black/30">
               푸스캔 AI
             </div>
-            <button className="w-9 h-9 rounded-full bg-black/40 flex items-center justify-center text-white backdrop-blur-md">
+            <button 
+              onClick={() => setShowHelp(true)}
+              className="w-9 h-9 rounded-full bg-black/40 flex items-center justify-center text-white backdrop-blur-md"
+            >
               <i className="fa-solid fa-question text-sm"></i>
             </button>
           </div>
@@ -244,6 +248,77 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, captur
            <div className="mt-8 w-16 h-16 rounded-xl border-2 border-white/30 overflow-hidden shadow-2xl">
               <img src={capturedImage || ''} className="w-full h-full object-cover" alt="Captured" />
            </div>
+        </div>
+      )}
+
+      {/* Help Modal */}
+      {showHelp && (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-6" onClick={() => setShowHelp(false)}>
+          <div 
+            className="bg-white rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-6 text-white text-center">
+              <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                <i className="fa-solid fa-poop text-3xl"></i>
+              </div>
+              <h2 className="text-xl font-bold">PoopScan AI</h2>
+              <p className="text-blue-100 text-sm mt-1">아기 대변 AI 분석 서비스</p>
+            </div>
+            
+            {/* Content */}
+            <div className="p-5 space-y-4">
+              <div className="flex gap-3">
+                <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center shrink-0">
+                  <i className="fa-solid fa-camera text-blue-600"></i>
+                </div>
+                <div>
+                  <h3 className="font-bold text-gray-800 text-sm">간편한 촬영</h3>
+                  <p className="text-xs text-gray-500">기저귀를 촬영하면 AI가 자동으로 분석해요</p>
+                </div>
+              </div>
+              
+              <div className="flex gap-3">
+                <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center shrink-0">
+                  <i className="fa-solid fa-chart-pie text-green-600"></i>
+                </div>
+                <div>
+                  <h3 className="font-bold text-gray-800 text-sm">상세 분석</h3>
+                  <p className="text-xs text-gray-500">색상, 제형, 양, 수분 상태 등을 분석해요</p>
+                </div>
+              </div>
+              
+              <div className="flex gap-3">
+                <div className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center shrink-0">
+                  <i className="fa-solid fa-lightbulb text-orange-600"></i>
+                </div>
+                <div>
+                  <h3 className="font-bold text-gray-800 text-sm">맞춤 가이드</h3>
+                  <p className="text-xs text-gray-500">AI가 아기 건강 관리 팁을 제공해요</p>
+                </div>
+              </div>
+              
+              {/* Warning */}
+              <div className="bg-amber-50 rounded-xl p-3 border border-amber-200">
+                <p className="text-[11px] text-amber-700 leading-relaxed">
+                  <i className="fa-solid fa-triangle-exclamation mr-1"></i>
+                  본 서비스는 참고용이며 의료 진단을 대체하지 않습니다. 
+                  이상 증상 발견 시 전문의와 상담하세요.
+                </p>
+              </div>
+            </div>
+            
+            {/* Footer */}
+            <div className="px-5 pb-5">
+              <button 
+                onClick={() => setShowHelp(false)}
+                className="w-full h-12 bg-blue-500 text-white rounded-xl font-bold active:scale-[0.98] transition-transform"
+              >
+                확인
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
