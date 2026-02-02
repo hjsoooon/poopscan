@@ -148,18 +148,6 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, captur
           </div>
         )}
 
-        {/* Guide Message Overlay */}
-        {!isProcessing && (
-          <div className="absolute top-16 left-0 right-0 z-10 px-4" style={{ marginTop: 'env(safe-area-inset-top, 0)' }}>
-            <div className="bg-blue-600/80 backdrop-blur-md rounded-lg px-3 py-2 flex items-center gap-2 shadow-lg max-w-xs mx-auto">
-              <i className="fa-solid fa-camera-retro text-white text-xs"></i>
-              <p className="text-[11px] font-medium text-white leading-tight">
-                기저귀를 중앙에 맞춰 촬영해 주세요
-              </p>
-            </div>
-          </div>
-        )}
-
         {/* Guide Lines & Scan Animation */}
         <div className="absolute inset-0 pointer-events-none flex items-center justify-center p-4">
           <div className={`w-[85%] max-w-[320px] aspect-[3/4] border-2 ${isProcessing ? 'border-blue-500/50' : 'border-white/50'} rounded-3xl relative transition-colors duration-500`}>
@@ -170,6 +158,15 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, captur
             
             {isProcessing && (
               <div className="scan-line absolute w-full rounded-full"></div>
+            )}
+
+            {/* Guide Message - 가이드 박스 안에 배치 */}
+            {!isProcessing && (
+              <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                <p className="text-white/90 text-xs font-medium text-center drop-shadow-lg">
+                  📷 기저귀를 프레임 안에 맞춰주세요
+                </p>
+              </div>
             )}
           </div>
         </div>
