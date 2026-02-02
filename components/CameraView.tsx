@@ -103,31 +103,30 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, captur
 
   return (
     <div className="fixed inset-0 bg-black flex flex-col safe-area-inset">
-      {/* Header Overlays */}
+      {/* Top Section: Header + Guide Message */}
       {!isProcessing && (
-        <div className="absolute top-0 left-0 right-0 z-10 p-4 pt-[max(1rem,env(safe-area-inset-top))] flex justify-between items-start pointer-events-none">
-          <button className="w-10 h-10 rounded-full bg-black/30 flex items-center justify-center text-white backdrop-blur-md pointer-events-auto">
-            <i className="fa-solid fa-chevron-left"></i>
-          </button>
-          <div className="text-white font-semibold text-lg tracking-tight backdrop-blur-md px-4 py-2 rounded-full bg-black/20 pointer-events-auto">
-            푸스캔 AI
-          </div>
-          <button className="w-10 h-10 rounded-full bg-black/30 flex items-center justify-center text-white backdrop-blur-md pointer-events-auto">
-            <i className="fa-solid fa-question"></i>
-          </button>
-        </div>
-      )}
-
-      {/* Photo Guide Message - Hidden during processing */}
-      {!isProcessing && (
-        <div className="absolute top-24 left-1/2 -translate-x-1/2 z-10 w-full px-6 pointer-events-none">
-          <div className="bg-blue-600/90 backdrop-blur-md rounded-2xl p-4 flex items-center gap-3 shadow-xl border border-blue-400/30 animate-pulse max-w-xs mx-auto">
-            <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white shrink-0">
-              <i className="fa-solid fa-camera-retro text-sm"></i>
+        <div className="shrink-0 z-10 flex flex-col" style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top, 0.75rem))' }}>
+          {/* Header */}
+          <div className="px-4 py-2 flex justify-between items-center">
+            <button className="w-10 h-10 rounded-full bg-black/30 flex items-center justify-center text-white backdrop-blur-md">
+              <i className="fa-solid fa-chevron-left"></i>
+            </button>
+            <div className="text-white font-semibold text-base tracking-tight backdrop-blur-md px-4 py-2 rounded-full bg-black/20">
+              푸스캔 AI
             </div>
-            <div className="flex-1">
-              <p className="text-[13px] font-bold text-white leading-tight">
-                기저귀를 가이드라인 중앙에 맞춰<br/>선명하게 촬영해 주세요
+            <button className="w-10 h-10 rounded-full bg-black/30 flex items-center justify-center text-white backdrop-blur-md">
+              <i className="fa-solid fa-question"></i>
+            </button>
+          </div>
+          
+          {/* Guide Message */}
+          <div className="px-4 py-2">
+            <div className="bg-blue-600/90 backdrop-blur-md rounded-xl p-3 flex items-center gap-3 shadow-lg border border-blue-400/30 max-w-sm mx-auto">
+              <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white shrink-0">
+                <i className="fa-solid fa-camera-retro text-sm"></i>
+              </div>
+              <p className="text-[12px] font-bold text-white leading-tight flex-1">
+                기저귀를 가이드라인 중앙에 맞춰 선명하게 촬영해 주세요
               </p>
             </div>
           </div>
@@ -135,7 +134,7 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, captur
       )}
 
       {/* Viewfinder */}
-      <div className="flex-1 relative flex items-center justify-center">
+      <div className="flex-1 relative flex items-center justify-center min-h-0">
         {isProcessing && capturedImage ? (
           // Blurred background image during processing
           <div className="absolute inset-0 w-full h-full">
@@ -165,15 +164,15 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, captur
         )}
         
         {/* Guide Lines & Scan Animation */}
-        <div className="absolute inset-0 pointer-events-none flex items-center justify-center px-6">
-          <div className={`w-full max-w-[280px] aspect-square border-2 ${isProcessing ? 'border-blue-500/50' : 'border-white/30'} rounded-3xl relative transition-colors duration-500`}>
+        <div className="absolute inset-0 pointer-events-none flex items-center justify-center p-8">
+          <div className={`w-full max-w-[260px] aspect-square border-2 ${isProcessing ? 'border-blue-500/50' : 'border-white/40'} rounded-3xl relative transition-colors duration-500`}>
             <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-blue-500 rounded-tl-2xl"></div>
             <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-blue-500 rounded-tr-2xl"></div>
             <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-blue-500 rounded-bl-2xl"></div>
             <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-blue-500 rounded-br-2xl"></div>
             
-            {(isProcessing || true) && (
-              <div className={`scan-line absolute w-full rounded-full ${!isProcessing && 'hidden'}`}></div>
+            {isProcessing && (
+              <div className="scan-line absolute w-full rounded-full"></div>
             )}
           </div>
         </div>
