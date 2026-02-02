@@ -164,7 +164,7 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, captur
             {!isProcessing && (
               <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 whitespace-nowrap">
                 <p className="text-white/90 text-xs font-medium text-center drop-shadow-lg">
-                  📷 기저귀를 프레임 안에 맞춰주세요
+                  📷 기저귀를 프레임 안에 맞춰서 촬영해 주세요
                 </p>
               </div>
             )}
