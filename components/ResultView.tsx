@@ -264,34 +264,45 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
 
       <div className="p-4 space-y-4">
         
-        {/* ========== 1. 요약 (신호등 + 한줄) ========== */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm">
-          {/* 신호등 */}
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="flex items-center gap-1.5">
-              <div className={`w-6 h-6 rounded-full ${analysis.status === 'normal' ? 'bg-green-500' : 'bg-gray-200'}`}></div>
-              <div className={`w-6 h-6 rounded-full ${analysis.status === 'caution' ? 'bg-yellow-500' : 'bg-gray-200'}`}></div>
-              <div className={`w-6 h-6 rounded-full ${analysis.status === 'warning' || analysis.status === 'emergency' ? 'bg-red-500' : 'bg-gray-200'}`}></div>
+        {/* ========== 사진 (상단 배치) ========== */}
+        <div className="relative rounded-2xl overflow-hidden aspect-[4/3] shadow-sm">
+          <img src={image} className="w-full h-full object-cover" alt="Diaper" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+          
+          {/* 상태 배지 */}
+          <div className="absolute top-3 left-3">
+            <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full ${statusStyle.bg} text-white text-sm font-bold`}>
+              <span>{statusStyle.icon}</span>
+              <span>{analysis.statusLabel}</span>
             </div>
-            <span className={`px-3 py-1 rounded-full text-sm font-bold ${statusStyle.light} ${statusStyle.text}`}>
-              {analysis.statusLabel}
-            </span>
+          </div>
+          
+          {/* 신뢰도 */}
+          <div className="absolute top-3 right-3 bg-black/50 text-white text-[10px] px-2 py-1 rounded-full backdrop-blur-sm">
+            신뢰도 {analysis.confidenceScore}%
+          </div>
+          
+          {/* 하단 정보 */}
+          <div className="absolute bottom-3 left-3 right-3">
+            <p className="text-white text-xs opacity-80">{analysis.analysisTime}</p>
+          </div>
+        </div>
+
+        {/* ========== 1. 요약 (신호등 + 한줄) ========== */}
+        <div className="bg-white rounded-2xl p-4 shadow-sm">
+          {/* 신호등 */}
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <div className="flex items-center gap-1">
+              <div className={`w-5 h-5 rounded-full ${analysis.status === 'normal' ? 'bg-green-500' : 'bg-gray-200'}`}></div>
+              <div className={`w-5 h-5 rounded-full ${analysis.status === 'caution' ? 'bg-yellow-500' : 'bg-gray-200'}`}></div>
+              <div className={`w-5 h-5 rounded-full ${analysis.status === 'warning' || analysis.status === 'emergency' ? 'bg-red-500' : 'bg-gray-200'}`}></div>
+            </div>
           </div>
 
           {/* 한줄 요약 */}
-          <p className="text-center text-lg font-bold text-gray-800 leading-relaxed">
+          <p className="text-center text-base font-bold text-gray-800 leading-relaxed">
             {analysis.summaryLine}
           </p>
-          
-          <p className="text-center text-xs text-gray-400 mt-2">{analysis.analysisTime}</p>
-        </div>
-
-        {/* 이미지 미리보기 */}
-        <div className="relative rounded-xl overflow-hidden aspect-video shadow-sm">
-          <img src={image} className="w-full h-full object-cover" alt="Diaper" />
-          <div className="absolute top-2 right-2 bg-black/50 text-white text-[10px] px-2 py-1 rounded-full">
-            신뢰도 {analysis.confidenceScore}%
-          </div>
         </div>
 
         {/* ========== 2. 분석 (굳기/양/색/특이소견) ========== */}
@@ -501,6 +512,19 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
             <p className="text-sm text-red-700 leading-relaxed">{analysis.hospitalAdvice}</p>
           </div>
         )}
+
+        {/* ========== AI 권고 메시지 ========== */}
+        <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-4 text-white shadow-lg">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center">
+              <i className="fa-solid fa-robot"></i>
+            </div>
+            <span className="font-bold text-sm">AI 분석 코멘트</span>
+          </div>
+          <p className="text-sm leading-relaxed opacity-90">
+            "{analysis.aiInsight}"
+          </p>
+        </div>
 
         {/* 버튼 */}
         <div className="space-y-2 pt-2">

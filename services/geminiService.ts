@@ -67,6 +67,7 @@ const mockResults: PoopAnalysisResult[] = [
       '하루 2-4회 배변은 건강한 범위예요',
     ],
     hospitalAdvice: null,
+    aiInsight: '황금빛 노란색의 부드러운 변은 소화가 잘 되고 있다는 신호예요. 장 건강이 아주 좋은 상태입니다. 현재 수유 패턴을 유지하시면 됩니다.',
     analysisTime: getCurrentTime(),
     confidenceScore: 94
   },
@@ -96,6 +97,7 @@ const mockResults: PoopAnalysisResult[] = [
       '수유 패턴을 잘 유지하고 있어요',
     ],
     hospitalAdvice: null,
+    aiInsight: '겨자색 크림형 변은 모유 수유 아기의 전형적인 건강 변이에요. 엄마 젖이 아기에게 잘 맞고, 소화도 원활하게 되고 있어요.',
     analysisTime: getCurrentTime(),
     confidenceScore: 91
   },
@@ -125,6 +127,7 @@ const mockResults: PoopAnalysisResult[] = [
       '한쪽 젖을 충분히 먹인 후 바꿔주세요',
     ],
     hospitalAdvice: null,
+    aiInsight: '녹색빛은 담즙 색소 때문이며 정상이에요. 전유(foremilk)를 많이 먹거나 장 통과 시간이 빠를 때 나타날 수 있어요. 한쪽 젖을 충분히 먹인 후 바꿔주시면 됩니다.',
     analysisTime: getCurrentTime(),
     confidenceScore: 88
   },
@@ -156,6 +159,7 @@ const mockResults: PoopAnalysisResult[] = [
       '기저귀 발진 예방에 신경 써주세요',
     ],
     hospitalAdvice: '탈수 증상(눈물 없이 울기, 소변 감소, 입술 마름)이 나타나면 소아과를 방문하세요',
+    aiInsight: '배변 횟수가 평소보다 많고 묽은 편이에요. 점액이 소량 관찰되며 장이 예민한 상태일 수 있어요. 탈수 예방을 위해 수분 섭취에 신경 써주세요.',
     analysisTime: getCurrentTime(),
     confidenceScore: 85
   },
@@ -186,6 +190,7 @@ const mockResults: PoopAnalysisResult[] = [
       '다리를 자전거 타듯 움직여 주세요',
     ],
     hospitalAdvice: '3일 이상 변을 못 보거나 배가 많이 빵빵하면 소아과를 방문하세요',
+    aiInsight: '변이 딱딱하고 작게 나왔어요. 변비 가능성이 있으니 수분 섭취를 늘리고, 배 마사지와 자전거 운동을 해주시면 도움이 됩니다.',
     analysisTime: getCurrentTime(),
     confidenceScore: 82
   },
@@ -216,6 +221,7 @@ const mockResults: PoopAnalysisResult[] = [
       '알레르기 반응(발진, 구토)을 관찰하세요',
     ],
     hospitalAdvice: null,
+    aiInsight: '이유식 시작 후 대변 색과 질감이 변하는 것은 자연스러운 현상이에요. 일부 소화되지 않은 음식 입자는 6-12개월 아기에게 흔히 관찰되니 걱정 마세요.',
     analysisTime: getCurrentTime(),
     confidenceScore: 90
   },
@@ -246,6 +252,7 @@ const mockResults: PoopAnalysisResult[] = [
       '분유 수유 아기는 1-2회/일도 정상이에요',
     ],
     hospitalAdvice: null,
+    aiInsight: '분유 수유 아기에게 나타나는 정상적인 대변이에요. 황갈색의 페이스트 형태는 분유가 잘 소화되고 있다는 신호입니다.',
     analysisTime: getCurrentTime(),
     confidenceScore: 92
   },
@@ -277,6 +284,7 @@ const mockResults: PoopAnalysisResult[] = [
       '수유/이유식 후 반응을 체크하세요',
     ],
     hospitalAdvice: '혈변이 2회 이상 반복되거나, 양이 많아지면 사진을 가지고 소아과를 방문하세요',
+    aiInsight: '혈흔이 소량 관찰되었어요. 항문 주변 상처나 알레르기 반응일 수 있어요. 다음 변을 관찰하시고, 반복되면 소아과 방문을 권해드려요.',
     analysisTime: getCurrentTime(),
     confidenceScore: 78
   }
@@ -301,6 +309,7 @@ const invalidResult: PoopAnalysisResult = {
   todayCount: 0,
   nextActions: ['기저귀 사진을 다시 촬영해 주세요'],
   hospitalAdvice: null,
+  aiInsight: '기저귀 사진을 업로드해 주세요. 배변이 보이는 기저귀를 선명하게 촬영해 주시면 정확한 분석이 가능합니다.',
   analysisTime: getCurrentTime(),
   confidenceScore: 0
 };

@@ -47,6 +47,9 @@ export interface PoopAnalysisResult {
   nextActions: string[];            // 다음 할 일
   hospitalAdvice: string | null;    // 병원 방문 권고 (있을 경우만)
   
+  // AI 권고 메시지
+  aiInsight: string;                // AI 분석 코멘트
+  
   // 메타 정보
   analysisTime: string;
   confidenceScore: number;
