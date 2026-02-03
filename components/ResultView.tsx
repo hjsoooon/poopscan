@@ -494,11 +494,11 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
                 <i className="fa-solid fa-clipboard-check text-yellow-500"></i>
                 <div>
                   <h3 className="text-sm font-bold text-gray-800">부모님 체크리스트</h3>
-                  <p className="text-[10px] text-gray-500">해당 증상 있으면 체크</p>
+                  <p className="text-xs text-gray-500">해당 증상 있으면 체크</p>
                 </div>
               </div>
               {parentCheckedCount > 0 && (
-                <span className="bg-red-100 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                <span className="bg-red-100 text-red-700 text-xs font-bold px-2 py-0.5 rounded-full">
                   {parentCheckedCount}개 해당
                 </span>
               )}
@@ -512,23 +512,23 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
                   <button
                     key={idx}
                     onClick={() => toggleParentCheck(idx)}
-                    className={`w-full px-3 py-2.5 flex items-center gap-2.5 text-left transition-colors ${
+                    className={`w-full px-3 py-3 flex items-center gap-3 text-left transition-colors ${
                       isChecked ? 'bg-red-50' : 'bg-white active:bg-gray-50'
                     }`}
                   >
                     {/* 체크박스 */}
-                    <div className={`w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-all ${
+                    <div className={`w-6 h-6 rounded border-2 flex items-center justify-center shrink-0 transition-all ${
                       isChecked 
                         ? 'bg-red-500 border-red-500'
                         : 'border-gray-300 bg-white'
                     }`}>
                       {isChecked && (
-                        <i className="fa-solid fa-check text-white text-[10px]"></i>
+                        <i className="fa-solid fa-check text-white text-xs"></i>
                       )}
                     </div>
                     
                     {/* 질문 텍스트 */}
-                    <p className={`flex-1 text-xs ${
+                    <p className={`flex-1 text-sm ${
                       isChecked ? 'text-red-700 font-medium' : 'text-gray-700'
                     }`}>
                       {check.question}
@@ -539,16 +539,16 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
             </div>
             
             {/* 결과 안내 */}
-            <div className={`px-3 py-2.5 border-t ${
+            <div className={`px-3 py-3 border-t ${
               parentCheckedCount > 0 ? 'bg-red-50 border-red-100' : 'bg-green-50 border-green-100'
             }`}>
               {parentCheckedCount > 0 ? (
-                <p className="text-xs text-red-700 flex items-center gap-1.5">
+                <p className="text-sm text-red-700 flex items-center gap-2">
                   <i className="fa-solid fa-triangle-exclamation"></i>
                   <span><strong>{parentCheckedCount}개</strong> 증상 해당. 관찰이 필요해요.</span>
                 </p>
               ) : (
-                <p className="text-xs text-green-700 flex items-center gap-1.5">
+                <p className="text-sm text-green-700 flex items-center gap-2">
                   <i className="fa-solid fa-circle-check"></i>
                   <span>해당 증상 없음. 좋아요!</span>
                 </p>
@@ -564,7 +564,7 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
               <i className="fa-solid fa-chart-simple text-purple-500"></i>
               <h3 className="text-sm font-bold text-gray-800">7일 기록</h3>
             </div>
-            <span className="text-[10px] text-gray-500">
+            <span className="text-xs text-gray-500">
               평균 {analysis.weeklyAverage.toFixed(1)}회/일
             </span>
           </div>
@@ -573,7 +573,7 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
             {analysis.weeklyTrend && analysis.weeklyTrend.length > 0 ? (
               <>
                 {/* 바 그래프 */}
-                <div className="flex items-end justify-between gap-1.5 h-24 mb-2">
+                <div className="flex items-end justify-between gap-2 h-28 mb-2">
                   {analysis.weeklyTrend.map((day, idx) => {
                     const maxCount = Math.max(...analysis.weeklyTrend.map(d => d.count), 1);
                     const height = (day.count / maxCount) * 100;
@@ -582,7 +582,7 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
                     return (
                       <div key={idx} className="flex-1 flex flex-col items-center">
                         {/* 횟수 표시 */}
-                        <span className={`text-[10px] font-bold mb-1 ${
+                        <span className={`text-xs font-bold mb-1 ${
                           isToday ? 'text-purple-600' : 
                           day.status === 'caution' ? 'text-yellow-600' : 'text-gray-500'
                         }`}>
@@ -590,7 +590,7 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
                         </span>
                         {/* 바 */}
                         <div 
-                          className={`w-full max-w-[24px] rounded-t transition-all ${
+                          className={`w-full max-w-[28px] rounded-t transition-all ${
                             day.count === 0 ? 'bg-gray-200' :
                             day.status === 'caution' ? 'bg-yellow-400' :
                             isToday ? 'bg-purple-500' : 'bg-purple-300'
@@ -601,7 +601,7 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
                           }}
                         ></div>
                         {/* 요일 */}
-                        <span className={`text-[10px] mt-1.5 ${
+                        <span className={`text-xs mt-2 ${
                           isToday ? 'text-purple-600 font-bold' : 'text-gray-400'
                         }`}>
                           {isToday ? '오늘' : day.day}
@@ -615,19 +615,19 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
                 <div className="mt-3 bg-gray-50 rounded-lg p-3 flex items-center justify-around">
                   <div className="text-center">
                     <p className="text-2xl font-bold text-purple-600">{analysis.todayCount}</p>
-                    <p className="text-[10px] text-gray-500">오늘</p>
+                    <p className="text-xs text-gray-500">오늘</p>
                   </div>
                   <div className="w-px h-10 bg-gray-200"></div>
                   <div className="text-center">
                     <p className="text-2xl font-bold text-gray-700">{analysis.weeklyAverage.toFixed(1)}</p>
-                    <p className="text-[10px] text-gray-500">주간 평균</p>
+                    <p className="text-xs text-gray-500">주간 평균</p>
                   </div>
                 </div>
               </>
             ) : (
               <div className="text-center py-6 text-gray-400">
                 <i className="fa-solid fa-chart-simple text-2xl mb-1"></i>
-                <p className="text-xs">기록된 데이터가 없어요</p>
+                <p className="text-sm">기록된 데이터가 없어요</p>
               </div>
             )}
           </div>
@@ -642,11 +642,11 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
           
           <div className="p-3 space-y-2">
             {analysis.nextActions.map((action, idx) => (
-              <div key={idx} className="flex items-start gap-2 bg-green-50 rounded-lg p-2.5">
-                <span className="w-5 h-5 bg-green-500 text-white rounded-full flex items-center justify-center text-[10px] font-bold shrink-0">
+              <div key={idx} className="flex items-start gap-2.5 bg-green-50 rounded-lg p-3">
+                <span className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-xs font-bold shrink-0">
                   {idx + 1}
                 </span>
-                <p className="text-xs text-gray-700 leading-relaxed">{action}</p>
+                <p className="text-sm text-gray-700 leading-relaxed">{action}</p>
               </div>
             ))}
           </div>
@@ -660,7 +660,7 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
               <h3 className="text-sm font-bold text-white">병원 방문 권고</h3>
             </div>
             <div className="p-3">
-              <p className="text-xs text-red-700 leading-relaxed">{analysis.hospitalAdvice}</p>
+              <p className="text-sm text-red-700 leading-relaxed">{analysis.hospitalAdvice}</p>
             </div>
           </div>
         )}
@@ -672,7 +672,7 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
             <h3 className="text-sm font-bold text-gray-800">AI 코멘트</h3>
           </div>
           <div className="p-3">
-            <p className="text-xs text-gray-600 leading-relaxed">
+            <p className="text-sm text-gray-600 leading-relaxed">
               {analysis.aiInsight}
             </p>
           </div>
