@@ -10,6 +10,23 @@ interface ResultViewProps {
 const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => {
   const [isSaving, setIsSaving] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
+  // 주의 신호 체크리스트 상태 (부모가 직접 체크)
+  const [checkedWarnings, setCheckedWarnings] = useState<boolean[]>(
+    new Array(analysis.warningChecks.length).fill(false)
+  );
+
+  const toggleWarningCheck = (idx: number) => {
+    setCheckedWarnings(prev => {
+      const newChecked = [...prev];
+      newChecked[idx] = !newChecked[idx];
+      return newChecked;
+    });
+  };
+
+  // 체크된 항목 중 주의가 필요한 것 개수
+  const checkedAlertCount = analysis.warningChecks.filter(
+    (w, idx) => checkedWarnings[idx] && w.isAlert
+  ).length;
 
   // 캔버스로 리포트 이미지 생성 (큰 텍스트)
   const createResultImage = async (): Promise<Blob> => {
@@ -275,9 +292,6 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
 
   // 굳기 바 계산 (1-5)
   const firmnessPercent = (analysis.firmnessScore / 5) * 100;
-  
-  // 경고 체크 중 alert가 있는 것의 개수
-  const alertCount = analysis.warningChecks.filter(w => w.isAlert).length;
 
   return (
     <div className="min-h-screen min-h-[100dvh] bg-gray-50 text-gray-900 pb-[max(6rem,env(safe-area-inset-bottom))]">
@@ -433,43 +447,99 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
           </div>
         </div>
 
-        {/* ========== 3. 주의 신호 (질문 체크리스트) ========== */}
+        {/* ========== 3. 주의 신호 체크리스트 (부모가 직접 체크) ========== */}
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-          <div className="px-4 py-3 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
-            <h3 className="text-sm font-bold flex items-center gap-2">
-              <i className="fa-solid fa-triangle-exclamation text-yellow-500"></i>
-              주의 신호 체크
-            </h3>
-            {alertCount > 0 ? (
-              <span className="bg-red-100 text-red-700 text-xs font-bold px-2 py-0.5 rounded-full">
-                {alertCount}개 주의
-              </span>
-            ) : (
-              <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-0.5 rounded-full">
-                모두 양호
-              </span>
-            )}
+          <div className="px-4 py-3 bg-gray-50 border-b border-gray-100">
+            <div className="flex items-center justify-between mb-1">
+              <h3 className="text-sm font-bold flex items-center gap-2">
+                <i className="fa-solid fa-clipboard-check text-yellow-500"></i>
+                주의 신호 체크리스트
+              </h3>
+              {checkedAlertCount > 0 ? (
+                <span className="bg-red-100 text-red-700 text-xs font-bold px-2 py-0.5 rounded-full">
+                  {checkedAlertCount}개 해당
+                </span>
+              ) : checkedWarnings.some(c => c) ? (
+                <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-0.5 rounded-full">
+                  양호
+                </span>
+              ) : null}
+            </div>
+            <p className="text-xs text-gray-500">해당하는 항목을 체크해 주세요</p>
           </div>
           
-          <div className="divide-y divide-gray-50">
-            {analysis.warningChecks.map((check, idx) => (
-              <div key={idx} className="px-4 py-3 flex items-start gap-3">
-                <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${
-                  check.isAlert ? 'bg-red-100' : 'bg-green-100'
-                }`}>
-                  <i className={`fa-solid ${check.isAlert ? 'fa-exclamation text-red-500' : 'fa-check text-green-500'} text-[10px]`}></i>
-                </div>
-                <div className="flex-1">
-                  <p className={`text-sm ${check.isAlert ? 'text-red-700 font-medium' : 'text-gray-600'}`}>
-                    {check.question}
-                  </p>
-                  {check.isAlert && check.detail && (
-                    <p className="text-xs text-red-500 mt-1">{check.detail}</p>
+          <div className="divide-y divide-gray-100">
+            {analysis.warningChecks.map((check, idx) => {
+              const isChecked = checkedWarnings[idx];
+              const showAlert = isChecked && check.isAlert;
+              
+              return (
+                <button
+                  key={idx}
+                  onClick={() => toggleWarningCheck(idx)}
+                  className={`w-full px-4 py-3.5 flex items-start gap-3 text-left transition-colors ${
+                    showAlert ? 'bg-red-50' : isChecked ? 'bg-green-50' : 'bg-white hover:bg-gray-50'
+                  }`}
+                >
+                  {/* 체크박스 */}
+                  <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center shrink-0 transition-all ${
+                    isChecked 
+                      ? showAlert 
+                        ? 'bg-red-500 border-red-500' 
+                        : 'bg-green-500 border-green-500'
+                      : 'border-gray-300 bg-white'
+                  }`}>
+                    {isChecked && (
+                      <i className="fa-solid fa-check text-white text-xs"></i>
+                    )}
+                  </div>
+                  
+                  {/* 질문 텍스트 */}
+                  <div className="flex-1 pt-0.5">
+                    <p className={`text-sm ${
+                      showAlert ? 'text-red-700 font-medium' : isChecked ? 'text-green-700' : 'text-gray-700'
+                    }`}>
+                      {check.question}
+                    </p>
+                    {showAlert && check.detail && (
+                      <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1">
+                        <i className="fa-solid fa-circle-info"></i>
+                        {check.detail}
+                      </p>
+                    )}
+                  </div>
+                  
+                  {/* 주의 표시 */}
+                  {check.isAlert && (
+                    <span className={`text-xs px-2 py-0.5 rounded-full shrink-0 ${
+                      isChecked ? 'bg-red-200 text-red-700' : 'bg-gray-100 text-gray-500'
+                    }`}>
+                      주의
+                    </span>
                   )}
-                </div>
-              </div>
-            ))}
+                </button>
+              );
+            })}
           </div>
+          
+          {/* 체크 완료 시 안내 */}
+          {checkedWarnings.every(c => c) && (
+            <div className={`px-4 py-3 border-t ${
+              checkedAlertCount > 0 ? 'bg-red-50 border-red-100' : 'bg-green-50 border-green-100'
+            }`}>
+              {checkedAlertCount > 0 ? (
+                <p className="text-sm text-red-700 flex items-center gap-2">
+                  <i className="fa-solid fa-triangle-exclamation"></i>
+                  <span><strong>{checkedAlertCount}개</strong> 항목에 주의가 필요해요</span>
+                </p>
+              ) : (
+                <p className="text-sm text-green-700 flex items-center gap-2">
+                  <i className="fa-solid fa-circle-check"></i>
+                  <span>모든 항목이 정상이에요!</span>
+                </p>
+              )}
+            </div>
+          )}
         </div>
 
         {/* ========== 4. 추세 (7일 그래프) ========== */}
