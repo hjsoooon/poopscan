@@ -33,7 +33,7 @@ export interface PoopAnalysisResult {
   color: string;                    // 색상 설명
   colorHex: string;                 // 색상 코드
   colorCategory: string;            // 황금변, 녹변, 갈색변 등
-  specialFindings: string[];        // 특이소견 (점액, 혈흔, 미소화 등)
+  specialFindings: string[];        // 특이소견 (점액, 혈흔, 덜 소화된 음식 등)
   
   // 3. 주의 신호 (질문 3~5개 + 결과)
   warningChecks: WarningCheck[];

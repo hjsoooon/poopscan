@@ -174,7 +174,7 @@ const mockResults: PoopAnalysisResult[] = [
     color: '진한 갈색',
     colorHex: '#8B4513',
     colorCategory: '갈색변',
-    specialFindings: ['딱딱한 덩어리 형태', '소량의 미소화 음식'],
+    specialFindings: ['딱딱한 덩어리 형태', '덜 소화된 음식물 조금'],
     warningChecks: [
       { question: '변에 피가 섞여 있나요?', isAlert: false },
       { question: '3일 이상 변을 보지 못했나요?', isAlert: false },
@@ -205,7 +205,7 @@ const mockResults: PoopAnalysisResult[] = [
     color: '연한 갈색',
     colorHex: '#D2691E',
     colorCategory: '갈색변',
-    specialFindings: ['미소화 음식 일부 관찰 (정상)'],
+    specialFindings: ['덜 소화된 음식물 일부 (정상)'],
     warningChecks: [
       { question: '변에 피가 섞여 있나요?', isAlert: false },
       { question: '특정 음식 후 피부 발진이 있나요?', isAlert: false },
