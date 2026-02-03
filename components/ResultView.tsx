@@ -11,7 +11,7 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
   const [isSaving, setIsSaving] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
 
-  // 캔버스로 리포트 이미지 생성 (컴팩트 + 큰 텍스트)
+  // 캔버스로 리포트 이미지 생성 (큰 텍스트)
   const createResultImage = async (): Promise<Blob> => {
     return new Promise((resolve, reject) => {
       const img = new Image();
@@ -24,10 +24,10 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
           return;
         }
 
-        // 캔버스 크기 설정 (더 작게)
+        // 캔버스 크기 설정
         const canvasWidth = 720;
         const imgHeight = (img.height / img.width) * canvasWidth;
-        const infoHeight = 480;
+        const infoHeight = 520;
         
         canvas.width = canvasWidth;
         canvas.height = imgHeight + infoHeight;
@@ -39,7 +39,7 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
         // 이미지
         ctx.drawImage(img, 0, 0, canvasWidth, imgHeight);
 
-        // 상태 배지 (이미지 위)
+        // 상태 배지 (이미지 위에 크게)
         const statusColors: Record<string, string> = {
           normal: '#22C55E',
           caution: '#EAB308',
@@ -53,46 +53,46 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
         
         ctx.fillStyle = statusColors[analysis.status] || '#6B7280';
         ctx.beginPath();
-        ctx.roundRect(canvasWidth / 2 - 60, 16, 120, 40, 20);
+        ctx.roundRect(canvasWidth / 2 - 75, 16, 150, 50, 25);
         ctx.fill();
         
         ctx.fillStyle = '#FFFFFF';
-        ctx.font = 'bold 20px -apple-system, sans-serif';
+        ctx.font = 'bold 28px -apple-system, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(statusLabels[analysis.status] || analysis.statusLabel, canvasWidth / 2, 43);
+        ctx.fillText(statusLabels[analysis.status] || analysis.statusLabel, canvasWidth / 2, 50);
 
         // 정보 영역
-        const padding = 28;
-        let y = imgHeight + 36;
+        const padding = 32;
+        let y = imgHeight + 48;
 
-        // 요약
+        // 요약 (크게)
         ctx.fillStyle = '#1F2937';
-        ctx.font = 'bold 26px -apple-system, sans-serif';
+        ctx.font = 'bold 32px -apple-system, sans-serif';
         ctx.textAlign = 'left';
         const summaryText = analysis.summaryLine.replace(/[^\w\sㄱ-힣.,!?]/g, '');
-        ctx.fillText(summaryText.slice(0, 25), padding, y);
+        ctx.fillText(summaryText.slice(0, 20), padding, y);
         
-        y += 28;
+        y += 36;
         ctx.fillStyle = '#9CA3AF';
-        ctx.font = '16px -apple-system, sans-serif';
+        ctx.font = '22px -apple-system, sans-serif';
         ctx.fillText(analysis.analysisTime, padding, y);
 
         // 구분선
-        y += 24;
+        y += 32;
         ctx.strokeStyle = '#E5E7EB';
-        ctx.lineWidth = 1;
+        ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.moveTo(padding, y);
         ctx.lineTo(canvasWidth - padding, y);
         ctx.stroke();
 
-        // 분석 결과
-        y += 32;
+        // 분석 결과 (크게)
+        y += 42;
         ctx.fillStyle = '#1F2937';
-        ctx.font = 'bold 20px -apple-system, sans-serif';
+        ctx.font = 'bold 26px -apple-system, sans-serif';
         ctx.fillText('📋 분석 결과', padding, y);
 
-        y += 32;
+        y += 40;
         const metrics = [
           { label: '굳기', value: analysis.firmness },
           { label: '양', value: analysis.amount },
@@ -103,47 +103,46 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
         metrics.forEach((item, idx) => {
           const x = padding + idx * colWidth;
           ctx.fillStyle = '#6B7280';
-          ctx.font = '15px -apple-system, sans-serif';
+          ctx.font = '20px -apple-system, sans-serif';
           ctx.fillText(item.label, x, y);
           ctx.fillStyle = '#1F2937';
-          ctx.font = 'bold 20px -apple-system, sans-serif';
-          ctx.fillText(item.value, x, y + 26);
+          ctx.font = 'bold 28px -apple-system, sans-serif';
+          ctx.fillText(item.value, x, y + 36);
         });
 
-        // 특이소견
-        y += 70;
+        // 특이소견 (크게)
+        y += 90;
         if (analysis.specialFindings.length > 0) {
           ctx.fillStyle = '#EA580C';
-          ctx.font = 'bold 18px -apple-system, sans-serif';
+          ctx.font = 'bold 24px -apple-system, sans-serif';
           ctx.fillText('⚠️ ' + analysis.specialFindings.join(', '), padding, y);
         } else {
           ctx.fillStyle = '#22C55E';
-          ctx.font = '18px -apple-system, sans-serif';
+          ctx.font = 'bold 24px -apple-system, sans-serif';
           ctx.fillText('✅ 특이소견 없음', padding, y);
         }
 
-        // 케어 가이드
-        y += 36;
+        // 케어 가이드 (크게)
+        y += 46;
         ctx.fillStyle = '#1F2937';
-        ctx.font = 'bold 20px -apple-system, sans-serif';
+        ctx.font = 'bold 26px -apple-system, sans-serif';
         ctx.fillText('💡 케어 가이드', padding, y);
         
-        y += 28;
-        ctx.font = '17px -apple-system, sans-serif';
+        y += 38;
+        ctx.font = '22px -apple-system, sans-serif';
         ctx.fillStyle = '#4B5563';
         
         analysis.nextActions.slice(0, 2).forEach(action => {
-          // 텍스트가 너무 길면 자르기
-          const shortAction = action.length > 35 ? action.slice(0, 35) + '...' : action;
+          const shortAction = action.length > 28 ? action.slice(0, 28) + '...' : action;
           ctx.fillText('• ' + shortAction, padding, y);
-          y += 26;
+          y += 34;
         });
 
         // 면책 조항
         ctx.fillStyle = '#9CA3AF';
-        ctx.font = '13px -apple-system, sans-serif';
+        ctx.font = '18px -apple-system, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText('⚠️ 참고용 정보이며, 정확한 진단은 전문의와 상담하세요', canvasWidth / 2, canvas.height - 20);
+        ctx.fillText('⚠️ 참고용 정보이며, 정확한 진단은 전문의와 상담하세요', canvasWidth / 2, canvas.height - 24);
 
         canvas.toBlob((blob) => {
           if (blob) resolve(blob);
