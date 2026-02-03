@@ -267,10 +267,10 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
     return (
       <div className="min-h-screen min-h-[100dvh] bg-gray-50 text-gray-900 pb-safe flex flex-col">
         <div className="sticky top-0 z-20 bg-white px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] flex items-center border-b border-gray-200">
-          <button onClick={onReset} className="w-10 h-10 flex items-center justify-center -ml-2">
+          <button onClick={onReset} className="w-10 h-10 flex items-center justify-center">
             <i className="fa-solid fa-arrow-left text-lg"></i>
           </button>
-          <h1 className="flex-1 text-center font-bold text-lg -mr-8">분석 결과</h1>
+          <h1 className="flex-1 text-center font-bold text-lg pr-10">분석 결과</h1>
         </div>
 
         <div className="flex-1 flex flex-col items-center justify-center p-6">
@@ -303,10 +303,10 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
     <div className="min-h-screen min-h-[100dvh] bg-gray-100 text-gray-900 overflow-x-hidden">
       {/* Header */}
       <div className="sticky top-0 z-20 bg-white px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] flex items-center border-b border-gray-200">
-        <button onClick={onReset} className="w-10 h-10 flex items-center justify-center -ml-2">
+        <button onClick={onReset} className="w-10 h-10 flex items-center justify-center">
           <i className="fa-solid fa-arrow-left text-lg"></i>
         </button>
-        <h1 className="flex-1 text-center font-bold text-lg -mr-8">분석 결과</h1>
+        <h1 className="flex-1 text-center font-bold text-lg pr-10">분석 결과</h1>
       </div>
 
       {/* 콘텐츠 영역 */}
