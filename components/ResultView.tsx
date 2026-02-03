@@ -493,7 +493,7 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
               <div className="flex items-center gap-2">
                 <i className="fa-solid fa-clipboard-check text-yellow-500"></i>
                 <div>
-                  <h3 className="text-sm font-bold text-gray-800">부모님 확인</h3>
+                  <h3 className="text-sm font-bold text-gray-800">부모님 체크리스트</h3>
                   <p className="text-[10px] text-gray-500">해당 증상 있으면 체크</p>
                 </div>
               </div>
