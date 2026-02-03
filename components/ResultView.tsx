@@ -388,8 +388,8 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           <div className="px-3 py-2.5 bg-white border-b border-gray-100 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <i className="fa-solid fa-clipboard-list text-blue-500"></i>
-              <h3 className="text-sm font-bold text-gray-800">분석 결과</h3>
+              <i className="fa-solid fa-robot text-blue-500"></i>
+              <h3 className="text-sm font-bold text-gray-800">AI 분석 결과</h3>
             </div>
             {aiAlertCount > 0 ? (
               <span className="bg-red-100 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded-full">
