@@ -1,49 +1,55 @@
 export type AnalysisStatus = 'normal' | 'caution' | 'warning' | 'emergency' | 'invalid';
 
 export type AmountLevel = '소량' | '보통' | '많음';
+export type FirmnessLevel = '딱딱함' | '단단함' | '정상' | '무름' | '묽음';
 export type HydrationLevel = '양호' | '보통' | '주의';
+
+// 주의 신호 질문 및 결과
+export interface WarningCheck {
+  question: string;
+  isAlert: boolean;
+  detail?: string;
+}
+
+// 7일 추세 데이터
+export interface TrendData {
+  day: string;          // 요일 (월, 화, 수...)
+  count: number;        // 배변 횟수
+  status: 'normal' | 'caution' | 'warning' | 'none';  // 상태
+}
 
 export interface PoopAnalysisResult {
   status: AnalysisStatus;
   statusLabel: string;
-  description: string;
   
-  // 친절한 헤드라인 (엄마 친화적)
-  friendlyHeadline: string;         // "오늘 장이 아주 튼튼해요!"
-  friendlyEmoji: string;            // ☀️, 💧, ⚠️
+  // 1. 요약 (신호등 + 한줄)
+  summaryLine: string;              // "건강한 변이에요!"
   
-  // 기본 분석
-  color: string;
-  colorHex: string;
-  colorFriendly: string;            // 황금변, 녹변 등 엄마들이 쓰는 용어
-  consistency: string;
-  frequencyToday: number;
-  
-  // 변 모양 (브리스톨 대체)
-  poopShape: string;                // 🍌 바나나, 🐰 토끼똥, 🍚 묽은 죽 등
-  poopShapeDesc: string;            // 건강해요, 변비 기운, 설사 기운 등
-  
-  // 추가 의학 지표
+  // 2. 분석 (굳기/양/색/특이소견)
+  firmness: FirmnessLevel;          // 굳기
+  firmnessScore: number;            // 1-5 (1:딱딱함 ~ 5:묽음)
   amount: AmountLevel;              // 양
-  hasMucus: boolean;                // 점액 유무
-  hasBlood: boolean;                // 혈액 유무
-  hasUndigested: boolean;           // 소화되지 않은 음식
-  hydration: HydrationLevel;        // 수분/탈수 상태
-  bristolType: number;              // 브리스톨 척도 (1-7)
+  amountScore: number;              // 1-3 (1:소량, 2:보통, 3:많음)
+  color: string;                    // 색상 설명
+  colorHex: string;                 // 색상 코드
+  colorCategory: string;            // 황금변, 녹변, 갈색변 등
+  specialFindings: string[];        // 특이소견 (점액, 혈흔, 미소화 등)
   
-  // 육아 솔루션 (행동 가이드)
-  hydrationAdvice: string;          // 수분 코칭
-  careAdvice: string[];             // 식이/케어 제안
-  hospitalAdvice: string | null;    // 병원 방문 신호
+  // 3. 주의 신호 (질문 3~5개 + 결과)
+  warningChecks: WarningCheck[];
   
-  // AI 인사이트
-  insight: string;
-  recommendations: string[];
-  warningSigns: string[];           // 감지된 주의 사항
+  // 4. 추세 (7일 그래프/카운트)
+  weeklyTrend: TrendData[];         // 최근 7일 추세
+  weeklyAverage: number;            // 주간 평균 횟수
+  todayCount: number;               // 오늘 횟수
+  
+  // 5. 안내 (다음 행동)
+  nextActions: string[];            // 다음 할 일
+  hospitalAdvice: string | null;    // 병원 방문 권고 (있을 경우만)
   
   // 메타 정보
-  analysisTime: string;             // 분석 시간
-  confidenceScore: number;          // 신뢰도 (0-100)
+  analysisTime: string;
+  confidenceScore: number;
 }
 
 export interface AppState {
