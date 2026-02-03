@@ -75,24 +75,45 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
       const filename = `poopscan_${timestamp}.png`;
       const file = new File([blob], filename, { type: 'image/png' });
 
-      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file] });
-      } else {
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = filename;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-        alert('분석 결과가 다운로드되었습니다!');
+      // Web Share API 지원 확인
+      if (navigator.share) {
+        try {
+          // 파일 공유 시도
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({ files: [file] });
+          } else {
+            // 파일 공유 미지원 시 URL로 공유
+            const url = URL.createObjectURL(blob);
+            await navigator.share({
+              title: 'PoopScan AI 분석 결과',
+              text: `${analysis.statusLabel}: ${analysis.summaryLine}`,
+            });
+            URL.revokeObjectURL(url);
+          }
+          setIsSharing(false);
+          return;
+        } catch (shareError) {
+          if ((shareError as Error).name === 'AbortError') {
+            setIsSharing(false);
+            return;
+          }
+          // 공유 실패 시 다운로드로 폴백
+        }
       }
+      
+      // 폴백: 다운로드
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      alert('이미지가 다운로드되었습니다. 다운로드 폴더에서 공유해 주세요.');
     } catch (error) {
-      if ((error as Error).name !== 'AbortError') {
-        console.error('Share failed:', error);
-        alert('공유에 실패했습니다.');
-      }
+      console.error('Share failed:', error);
+      alert('이미지 생성에 실패했습니다. 다시 시도해 주세요.');
     }
     setIsSharing(false);
   };
@@ -198,12 +219,31 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
 
         {/* ========== 1. 요약 (신호등 + 한줄) ========== */}
         <div className="bg-white rounded-2xl p-4 shadow-sm">
-          {/* 신호등 */}
-          <div className="flex items-center justify-center gap-2 mb-3">
-            <div className="flex items-center gap-1">
-              <div className={`w-5 h-5 rounded-full ${analysis.status === 'normal' ? 'bg-green-500' : 'bg-gray-200'}`}></div>
-              <div className={`w-5 h-5 rounded-full ${analysis.status === 'caution' ? 'bg-yellow-500' : 'bg-gray-200'}`}></div>
-              <div className={`w-5 h-5 rounded-full ${analysis.status === 'warning' || analysis.status === 'emergency' ? 'bg-red-500' : 'bg-gray-200'}`}></div>
+          {/* 신호등 - 레이블 포함 */}
+          <div className="flex items-center justify-center gap-4 mb-4">
+            <div className="flex flex-col items-center">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                analysis.status === 'normal' ? 'bg-green-500 ring-4 ring-green-100' : 'bg-gray-200'
+              }`}>
+                {analysis.status === 'normal' && <i className="fa-solid fa-check text-white text-sm"></i>}
+              </div>
+              <span className={`text-[10px] mt-1 font-medium ${analysis.status === 'normal' ? 'text-green-600' : 'text-gray-400'}`}>좋음</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                analysis.status === 'caution' ? 'bg-yellow-500 ring-4 ring-yellow-100' : 'bg-gray-200'
+              }`}>
+                {analysis.status === 'caution' && <i className="fa-solid fa-minus text-white text-sm"></i>}
+              </div>
+              <span className={`text-[10px] mt-1 font-medium ${analysis.status === 'caution' ? 'text-yellow-600' : 'text-gray-400'}`}>관찰</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                analysis.status === 'warning' || analysis.status === 'emergency' ? 'bg-red-500 ring-4 ring-red-100' : 'bg-gray-200'
+              }`}>
+                {(analysis.status === 'warning' || analysis.status === 'emergency') && <i className="fa-solid fa-exclamation text-white text-sm"></i>}
+              </div>
+              <span className={`text-[10px] mt-1 font-medium ${analysis.status === 'warning' || analysis.status === 'emergency' ? 'text-red-600' : 'text-gray-400'}`}>주의</span>
             </div>
           </div>
 
