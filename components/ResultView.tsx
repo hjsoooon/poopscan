@@ -11,7 +11,7 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
   const [isSaving, setIsSaving] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
 
-  // 캔버스로 리포트 이미지 생성
+  // 캔버스로 리포트 이미지 생성 (컴팩트 + 큰 텍스트)
   const createResultImage = async (): Promise<Blob> => {
     return new Promise((resolve, reject) => {
       const img = new Image();
@@ -24,22 +24,22 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
           return;
         }
 
-        // 캔버스 크기 설정
-        const canvasWidth = 1080;
+        // 캔버스 크기 설정 (더 작게)
+        const canvasWidth = 720;
         const imgHeight = (img.height / img.width) * canvasWidth;
-        const infoHeight = 600;
+        const infoHeight = 480;
         
         canvas.width = canvasWidth;
         canvas.height = imgHeight + infoHeight;
 
         // 배경
-        ctx.fillStyle = '#F9FAFB';
+        ctx.fillStyle = '#FFFFFF';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
         // 이미지
         ctx.drawImage(img, 0, 0, canvasWidth, imgHeight);
 
-        // 상태 배지
+        // 상태 배지 (이미지 위)
         const statusColors: Record<string, string> = {
           normal: '#22C55E',
           caution: '#EAB308',
@@ -53,32 +53,32 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
         
         ctx.fillStyle = statusColors[analysis.status] || '#6B7280';
         ctx.beginPath();
-        ctx.roundRect(canvasWidth / 2 - 80, 24, 160, 48, 24);
+        ctx.roundRect(canvasWidth / 2 - 60, 16, 120, 40, 20);
         ctx.fill();
         
         ctx.fillStyle = '#FFFFFF';
-        ctx.font = 'bold 22px -apple-system, sans-serif';
+        ctx.font = 'bold 20px -apple-system, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(statusLabels[analysis.status] || analysis.statusLabel, canvasWidth / 2, 56);
+        ctx.fillText(statusLabels[analysis.status] || analysis.statusLabel, canvasWidth / 2, 43);
 
         // 정보 영역
-        const padding = 40;
-        let y = imgHeight + 50;
+        const padding = 28;
+        let y = imgHeight + 36;
 
         // 요약
         ctx.fillStyle = '#1F2937';
-        ctx.font = 'bold 28px -apple-system, sans-serif';
+        ctx.font = 'bold 26px -apple-system, sans-serif';
         ctx.textAlign = 'left';
         const summaryText = analysis.summaryLine.replace(/[^\w\sㄱ-힣.,!?]/g, '');
-        ctx.fillText(summaryText, padding, y);
+        ctx.fillText(summaryText.slice(0, 25), padding, y);
         
-        y += 32;
+        y += 28;
         ctx.fillStyle = '#9CA3AF';
-        ctx.font = '18px -apple-system, sans-serif';
+        ctx.font = '16px -apple-system, sans-serif';
         ctx.fillText(analysis.analysisTime, padding, y);
 
         // 구분선
-        y += 30;
+        y += 24;
         ctx.strokeStyle = '#E5E7EB';
         ctx.lineWidth = 1;
         ctx.beginPath();
@@ -87,12 +87,12 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
         ctx.stroke();
 
         // 분석 결과
-        y += 40;
+        y += 32;
         ctx.fillStyle = '#1F2937';
         ctx.font = 'bold 20px -apple-system, sans-serif';
         ctx.fillText('📋 분석 결과', padding, y);
 
-        y += 35;
+        y += 32;
         const metrics = [
           { label: '굳기', value: analysis.firmness },
           { label: '양', value: analysis.amount },
@@ -103,77 +103,52 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
         metrics.forEach((item, idx) => {
           const x = padding + idx * colWidth;
           ctx.fillStyle = '#6B7280';
-          ctx.font = '16px -apple-system, sans-serif';
+          ctx.font = '15px -apple-system, sans-serif';
           ctx.fillText(item.label, x, y);
           ctx.fillStyle = '#1F2937';
           ctx.font = 'bold 20px -apple-system, sans-serif';
-          ctx.fillText(item.value, x, y + 28);
+          ctx.fillText(item.value, x, y + 26);
         });
 
         // 특이소견
-        y += 80;
+        y += 70;
         if (analysis.specialFindings.length > 0) {
           ctx.fillStyle = '#EA580C';
           ctx.font = 'bold 18px -apple-system, sans-serif';
-          ctx.fillText('⚠️ 특이소견: ' + analysis.specialFindings.join(', '), padding, y);
-          y += 35;
+          ctx.fillText('⚠️ ' + analysis.specialFindings.join(', '), padding, y);
         } else {
           ctx.fillStyle = '#22C55E';
           ctx.font = '18px -apple-system, sans-serif';
           ctx.fillText('✅ 특이소견 없음', padding, y);
-          y += 35;
         }
 
         // 케어 가이드
+        y += 36;
         ctx.fillStyle = '#1F2937';
         ctx.font = 'bold 20px -apple-system, sans-serif';
         ctx.fillText('💡 케어 가이드', padding, y);
         
-        y += 30;
+        y += 28;
         ctx.font = '17px -apple-system, sans-serif';
         ctx.fillStyle = '#4B5563';
         
         analysis.nextActions.slice(0, 2).forEach(action => {
-          ctx.fillText('• ' + action, padding, y);
-          y += 28;
+          // 텍스트가 너무 길면 자르기
+          const shortAction = action.length > 35 ? action.slice(0, 35) + '...' : action;
+          ctx.fillText('• ' + shortAction, padding, y);
+          y += 26;
         });
-
-        // AI 코멘트
-        y += 20;
-        ctx.fillStyle = '#1F2937';
-        ctx.font = 'bold 18px -apple-system, sans-serif';
-        ctx.fillText('🤖 AI 코멘트', padding, y);
-        
-        y += 28;
-        ctx.font = '16px -apple-system, sans-serif';
-        ctx.fillStyle = '#6B7280';
-        
-        // 줄바꿈 처리
-        const maxWidth = canvasWidth - padding * 2;
-        const words = analysis.aiInsight.split(' ');
-        let line = '';
-        for (const word of words) {
-          const testLine = line + word + ' ';
-          if (ctx.measureText(testLine).width > maxWidth && line !== '') {
-            ctx.fillText(line.trim(), padding, y);
-            line = word + ' ';
-            y += 24;
-          } else {
-            line = testLine;
-          }
-        }
-        if (line) ctx.fillText(line.trim(), padding, y);
 
         // 면책 조항
         ctx.fillStyle = '#9CA3AF';
-        ctx.font = '14px -apple-system, sans-serif';
+        ctx.font = '13px -apple-system, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText('⚠️ 참고용 정보이며, 정확한 진단은 전문의와 상담하세요.', canvasWidth / 2, canvas.height - 30);
+        ctx.fillText('⚠️ 참고용 정보이며, 정확한 진단은 전문의와 상담하세요', canvasWidth / 2, canvas.height - 20);
 
         canvas.toBlob((blob) => {
           if (blob) resolve(blob);
           else reject(new Error('Failed to create blob'));
-        }, 'image/png');
+        }, 'image/jpeg', 0.9);
       };
       
       img.onerror = () => reject(new Error('Failed to load image'));
@@ -186,12 +161,12 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
     try {
       const blob = await createResultImage();
       const timestamp = new Date().toISOString().slice(0, 10);
-      const filename = `poopscan_${timestamp}.png`;
+      const filename = `poopscan_${timestamp}.jpg`;
 
       if (navigator.share && navigator.canShare) {
-        const file = new File([blob], filename, { type: 'image/png' });
+        const file = new File([blob], filename, { type: 'image/jpeg' });
         if (navigator.canShare({ files: [file] })) {
-          await navigator.share({ files: [file], title: 'PoopScan AI 분석 결과' });
+          await navigator.share({ files: [file] });
           setIsSaving(false);
           return;
         }
@@ -218,24 +193,13 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
     try {
       const blob = await createResultImage();
       const timestamp = new Date().toISOString().slice(0, 10);
-      const filename = `poopscan_${timestamp}.png`;
-      const file = new File([blob], filename, { type: 'image/png' });
+      const filename = `poopscan_${timestamp}.jpg`;
+      const file = new File([blob], filename, { type: 'image/jpeg' });
 
-      // Web Share API 지원 확인
-      if (navigator.share) {
+      // Web Share API로 이미지만 공유
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
         try {
-          // 파일 공유 시도
-          if (navigator.canShare && navigator.canShare({ files: [file] })) {
-            await navigator.share({ files: [file] });
-          } else {
-            // 파일 공유 미지원 시 URL로 공유
-            const url = URL.createObjectURL(blob);
-            await navigator.share({
-              title: 'PoopScan AI 분석 결과',
-              text: `${analysis.statusLabel}: ${analysis.summaryLine}`,
-            });
-            URL.revokeObjectURL(url);
-          }
+          await navigator.share({ files: [file] });
           setIsSharing(false);
           return;
         } catch (shareError) {
@@ -243,7 +207,6 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
             setIsSharing(false);
             return;
           }
-          // 공유 실패 시 다운로드로 폴백
         }
       }
       
@@ -256,7 +219,7 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
-      alert('이미지가 다운로드되었습니다. 다운로드 폴더에서 공유해 주세요.');
+      alert('이미지가 다운로드되었습니다.');
     } catch (error) {
       console.error('Share failed:', error);
       alert('이미지 생성에 실패했습니다. 다시 시도해 주세요.');
