@@ -105,7 +105,7 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, captur
   // 카메라 권한이 없는 경우 별도 화면
   if (hasPermission === false) {
     return (
-      <div className="fixed inset-0 bg-gradient-to-b from-gray-900 to-black flex flex-col safe-area-inset">
+      <div className="absolute inset-0 bg-gradient-to-b from-gray-900 to-black flex flex-col safe-area-inset">
         {/* Header */}
         <div className="px-4 flex justify-between items-center" style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top, 0.75rem))' }}>
           <div className="w-9 h-9"></div>
@@ -163,7 +163,7 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, captur
 
         {/* Help Modal */}
         {showHelp && (
-          <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-6" onClick={() => setShowHelp(false)}>
+          <div className="absolute inset-0 bg-black/70 z-50 flex items-center justify-center p-6" onClick={() => setShowHelp(false)}>
             <div 
               className="bg-white rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl"
               onClick={(e) => e.stopPropagation()}
@@ -226,7 +226,7 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, captur
   }
 
   return (
-    <div className="fixed inset-0 bg-black flex flex-col safe-area-inset">
+    <div className="absolute inset-0 bg-black flex flex-col safe-area-inset">
       {/* Viewfinder - 전체 화면 */}
       <div className="flex-1 relative min-h-0">
         {isProcessing && capturedImage ? (
@@ -346,7 +346,7 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, captur
       </div>
 
       {isProcessing && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex flex-col items-center justify-center text-white backdrop-blur-sm">
+        <div className="absolute inset-0 bg-black/60 z-50 flex flex-col items-center justify-center text-white backdrop-blur-sm">
            {/* Background captured image */}
            {capturedImage && (
              <div className="absolute inset-0 -z-10">
@@ -377,7 +377,7 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, captur
 
       {/* Help Modal */}
       {showHelp && (
-        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-6" onClick={() => setShowHelp(false)}>
+        <div className="absolute inset-0 bg-black/70 z-50 flex items-center justify-center p-6" onClick={() => setShowHelp(false)}>
           <div 
             className="bg-white rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl"
             onClick={(e) => e.stopPropagation()}
