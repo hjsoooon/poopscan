@@ -170,7 +170,7 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
           </p>
         </div>
 
-        <div className="p-4 space-y-4">
+        <div className="p-4 pb-3 space-y-4">
         
         {/* ========== 사진 (상단 배치) ========== */}
         <div className="relative rounded-2xl overflow-hidden aspect-[4/3] shadow-sm">
@@ -435,7 +435,7 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
         </div>
 
         {/* 면책 조항 */}
-        <p className="text-[10px] text-gray-400 text-center leading-relaxed pt-2 pb-4">
+        <p className="text-[10px] text-gray-400 text-center leading-relaxed pt-2">
           본 서비스는 참고용이며 의료 진단을 대신하지 않습니다.<br/>
           이상 증상 시 소아청소년과 전문의와 상담하세요.
         </p>
