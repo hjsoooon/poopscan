@@ -50,7 +50,7 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
         // 캔버스 크기 설정
         const canvasWidth = 720;
         const imgHeight = (img.height / img.width) * canvasWidth;
-        const infoHeight = 520;
+        const infoHeight = 560;
         
         canvas.width = canvasWidth;
         canvas.height = imgHeight + infoHeight;
@@ -86,18 +86,41 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
 
         // 정보 영역
         const padding = 32;
-        let y = imgHeight + 48;
+        let y = imgHeight + 44;
 
-        // 요약 (크게)
+        // 요약 (줄바꿈 지원)
         ctx.fillStyle = '#1F2937';
-        ctx.font = 'bold 32px -apple-system, sans-serif';
+        ctx.font = 'bold 28px -apple-system, sans-serif';
         ctx.textAlign = 'left';
         const summaryText = analysis.summaryLine.replace(/[^\w\sㄱ-힣.,!?]/g, '');
-        ctx.fillText(summaryText.slice(0, 20), padding, y);
         
-        y += 36;
+        // 텍스트 줄바꿈 처리
+        const maxWidth = canvasWidth - padding * 2;
+        const words = summaryText.split('');
+        let line = '';
+        let lineCount = 0;
+        
+        for (let i = 0; i < words.length; i++) {
+          const testLine = line + words[i];
+          const metrics = ctx.measureText(testLine);
+          if (metrics.width > maxWidth && line !== '') {
+            ctx.fillText(line, padding, y);
+            line = words[i];
+            y += 34;
+            lineCount++;
+            if (lineCount >= 2) break; // 최대 2줄
+          } else {
+            line = testLine;
+          }
+        }
+        if (line && lineCount < 2) {
+          ctx.fillText(line, padding, y);
+          y += 34;
+        }
+        
+        y += 4;
         ctx.fillStyle = '#9CA3AF';
-        ctx.font = '22px -apple-system, sans-serif';
+        ctx.font = '20px -apple-system, sans-serif';
         ctx.fillText(analysis.analysisTime, padding, y);
 
         // 구분선
