@@ -596,43 +596,49 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
             {analysis.weeklyTrend && analysis.weeklyTrend.length > 0 ? (
               <>
                 {/* 바 그래프 */}
-                <div className="flex items-end justify-between gap-2 h-28 mb-2">
-                  {analysis.weeklyTrend.map((day, idx) => {
-                    const maxCount = Math.max(...analysis.weeklyTrend.map(d => d.count), 1);
-                    const height = (day.count / maxCount) * 100;
-                    const isToday = idx === analysis.weeklyTrend.length - 1;
-                    
-                    return (
-                      <div key={idx} className="flex-1 flex flex-col items-center">
-                        {/* 횟수 표시 */}
-                        <span className={`text-xs font-bold mb-1 ${
-                          isToday ? 'text-purple-600' : 
-                          day.status === 'caution' ? 'text-yellow-600' : 'text-gray-500'
-                        }`}>
-                          {day.count > 0 ? day.count : '-'}
-                        </span>
-                        {/* 바 */}
-                        <div 
-                          className={`w-full max-w-[28px] rounded-t transition-all ${
-                            day.count === 0 ? 'bg-gray-200' :
-                            day.status === 'caution' ? 'bg-yellow-400' :
-                            isToday ? 'bg-purple-500' : 'bg-purple-300'
-                          }`}
-                          style={{ 
-                            height: `${day.count === 0 ? 10 : Math.max(height, 20)}%`,
-                            minHeight: day.count === 0 ? '6px' : '12px'
-                          }}
-                        ></div>
-                        {/* 요일 */}
-                        <span className={`text-xs mt-2 ${
-                          isToday ? 'text-purple-600 font-bold' : 'text-gray-400'
-                        }`}>
-                          {isToday ? '오늘' : day.day}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
+                {(() => {
+                  const maxCount = Math.max(...analysis.weeklyTrend.map(d => d.count), 1);
+                  const barMaxHeight = 80; // 최대 바 높이 (px)
+                  
+                  return (
+                    <div className="flex items-end justify-between gap-2 mb-2" style={{ height: '120px' }}>
+                      {analysis.weeklyTrend.map((day, idx) => {
+                        const isToday = idx === analysis.weeklyTrend.length - 1;
+                        // 횟수에 비례한 높이 계산 (최소 8px, 최대 80px)
+                        const barHeight = day.count === 0 
+                          ? 8 
+                          : Math.max(16, (day.count / maxCount) * barMaxHeight);
+                        
+                        return (
+                          <div key={idx} className="flex-1 flex flex-col items-center justify-end h-full">
+                            {/* 횟수 표시 */}
+                            <span className={`text-xs font-bold mb-1 ${
+                              isToday ? 'text-purple-600' : 
+                              day.status === 'caution' ? 'text-yellow-600' : 'text-gray-500'
+                            }`}>
+                              {day.count > 0 ? day.count : '-'}
+                            </span>
+                            {/* 바 */}
+                            <div 
+                              className={`w-full max-w-[28px] rounded-t transition-all ${
+                                day.count === 0 ? 'bg-gray-200' :
+                                day.status === 'caution' ? 'bg-yellow-400' :
+                                isToday ? 'bg-purple-500' : 'bg-purple-300'
+                              }`}
+                              style={{ height: `${barHeight}px` }}
+                            ></div>
+                            {/* 요일 */}
+                            <span className={`text-xs mt-2 ${
+                              isToday ? 'text-purple-600 font-bold' : 'text-gray-400'
+                            }`}>
+                              {isToday ? '오늘' : day.day}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })()}
 
                 {/* 요약 */}
                 <div className="mt-3 bg-gray-50 rounded-lg p-3 flex items-center justify-around">
