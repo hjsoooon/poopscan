@@ -1,5 +1,4 @@
-import React, { useState, useRef } from 'react';
-import html2canvas from 'html2canvas';
+import React, { useState } from 'react';
 import { PoopAnalysisResult } from '../types';
 
 interface ResultViewProps {
@@ -11,27 +10,174 @@ interface ResultViewProps {
 const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => {
   const [isSaving, setIsSaving] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
-  const reportRef = useRef<HTMLDivElement>(null);
 
-  // 화면 그대로 캡처
+  // 캔버스로 리포트 이미지 생성
   const createResultImage = async (): Promise<Blob> => {
-    if (!reportRef.current) {
-      throw new Error('Report element not found');
-    }
-
-    const canvas = await html2canvas(reportRef.current, {
-      scale: 2, // 고화질을 위해 2배 스케일
-      useCORS: true,
-      allowTaint: true,
-      backgroundColor: '#F9FAFB',
-      logging: false,
-    });
-
     return new Promise((resolve, reject) => {
-      canvas.toBlob((blob) => {
-        if (blob) resolve(blob);
-        else reject(new Error('Failed to create blob'));
-      }, 'image/png');
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          reject(new Error('Canvas context not available'));
+          return;
+        }
+
+        // 캔버스 크기 설정
+        const canvasWidth = 1080;
+        const imgHeight = (img.height / img.width) * canvasWidth;
+        const infoHeight = 600;
+        
+        canvas.width = canvasWidth;
+        canvas.height = imgHeight + infoHeight;
+
+        // 배경
+        ctx.fillStyle = '#F9FAFB';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // 이미지
+        ctx.drawImage(img, 0, 0, canvasWidth, imgHeight);
+
+        // 상태 배지
+        const statusColors: Record<string, string> = {
+          normal: '#22C55E',
+          caution: '#EAB308',
+          warning: '#EF4444',
+        };
+        const statusLabels: Record<string, string> = {
+          normal: '좋음 ✓',
+          caution: '관찰 −',
+          warning: '주의 !',
+        };
+        
+        ctx.fillStyle = statusColors[analysis.status] || '#6B7280';
+        ctx.beginPath();
+        ctx.roundRect(canvasWidth / 2 - 80, 24, 160, 48, 24);
+        ctx.fill();
+        
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = 'bold 22px -apple-system, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(statusLabels[analysis.status] || analysis.statusLabel, canvasWidth / 2, 56);
+
+        // 정보 영역
+        const padding = 40;
+        let y = imgHeight + 50;
+
+        // 요약
+        ctx.fillStyle = '#1F2937';
+        ctx.font = 'bold 28px -apple-system, sans-serif';
+        ctx.textAlign = 'left';
+        const summaryText = analysis.summaryLine.replace(/[^\w\sㄱ-힣.,!?]/g, '');
+        ctx.fillText(summaryText, padding, y);
+        
+        y += 32;
+        ctx.fillStyle = '#9CA3AF';
+        ctx.font = '18px -apple-system, sans-serif';
+        ctx.fillText(analysis.analysisTime, padding, y);
+
+        // 구분선
+        y += 30;
+        ctx.strokeStyle = '#E5E7EB';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(padding, y);
+        ctx.lineTo(canvasWidth - padding, y);
+        ctx.stroke();
+
+        // 분석 결과
+        y += 40;
+        ctx.fillStyle = '#1F2937';
+        ctx.font = 'bold 20px -apple-system, sans-serif';
+        ctx.fillText('📋 분석 결과', padding, y);
+
+        y += 35;
+        const metrics = [
+          { label: '굳기', value: analysis.firmness },
+          { label: '양', value: analysis.amount },
+          { label: '색상', value: analysis.colorCategory },
+        ];
+        const colWidth = (canvasWidth - padding * 2) / 3;
+        
+        metrics.forEach((item, idx) => {
+          const x = padding + idx * colWidth;
+          ctx.fillStyle = '#6B7280';
+          ctx.font = '16px -apple-system, sans-serif';
+          ctx.fillText(item.label, x, y);
+          ctx.fillStyle = '#1F2937';
+          ctx.font = 'bold 20px -apple-system, sans-serif';
+          ctx.fillText(item.value, x, y + 28);
+        });
+
+        // 특이소견
+        y += 80;
+        if (analysis.specialFindings.length > 0) {
+          ctx.fillStyle = '#EA580C';
+          ctx.font = 'bold 18px -apple-system, sans-serif';
+          ctx.fillText('⚠️ 특이소견: ' + analysis.specialFindings.join(', '), padding, y);
+          y += 35;
+        } else {
+          ctx.fillStyle = '#22C55E';
+          ctx.font = '18px -apple-system, sans-serif';
+          ctx.fillText('✅ 특이소견 없음', padding, y);
+          y += 35;
+        }
+
+        // 케어 가이드
+        ctx.fillStyle = '#1F2937';
+        ctx.font = 'bold 20px -apple-system, sans-serif';
+        ctx.fillText('💡 케어 가이드', padding, y);
+        
+        y += 30;
+        ctx.font = '17px -apple-system, sans-serif';
+        ctx.fillStyle = '#4B5563';
+        
+        analysis.nextActions.slice(0, 2).forEach(action => {
+          ctx.fillText('• ' + action, padding, y);
+          y += 28;
+        });
+
+        // AI 코멘트
+        y += 20;
+        ctx.fillStyle = '#1F2937';
+        ctx.font = 'bold 18px -apple-system, sans-serif';
+        ctx.fillText('🤖 AI 코멘트', padding, y);
+        
+        y += 28;
+        ctx.font = '16px -apple-system, sans-serif';
+        ctx.fillStyle = '#6B7280';
+        
+        // 줄바꿈 처리
+        const maxWidth = canvasWidth - padding * 2;
+        const words = analysis.aiInsight.split(' ');
+        let line = '';
+        for (const word of words) {
+          const testLine = line + word + ' ';
+          if (ctx.measureText(testLine).width > maxWidth && line !== '') {
+            ctx.fillText(line.trim(), padding, y);
+            line = word + ' ';
+            y += 24;
+          } else {
+            line = testLine;
+          }
+        }
+        if (line) ctx.fillText(line.trim(), padding, y);
+
+        // 면책 조항
+        ctx.fillStyle = '#9CA3AF';
+        ctx.font = '14px -apple-system, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('⚠️ 참고용 정보이며, 정확한 진단은 전문의와 상담하세요.', canvasWidth / 2, canvas.height - 30);
+
+        canvas.toBlob((blob) => {
+          if (blob) resolve(blob);
+          else reject(new Error('Failed to create blob'));
+        }, 'image/png');
+      };
+      
+      img.onerror = () => reject(new Error('Failed to load image'));
+      img.src = image;
     });
   };
 
@@ -181,8 +327,8 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
         <h1 className="flex-1 text-center font-bold text-lg -mr-8">분석 결과</h1>
       </div>
 
-      {/* 캡처 영역 시작 */}
-      <div ref={reportRef} className="bg-gray-50">
+      {/* 콘텐츠 영역 */}
+      <div className="bg-gray-50">
         {/* Demo Banner */}
         <div className="bg-amber-50 border-b border-amber-100 px-4 py-2">
           <p className="text-[11px] text-amber-700 text-center">
@@ -481,9 +627,8 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
         </p>
         </div>
       </div>
-      {/* 캡처 영역 끝 */}
 
-      {/* 버튼 (캡처 영역 외부) */}
+      {/* 버튼 */}
       <div className="px-4 pb-4 space-y-2 bg-gray-50">
         <button 
           onClick={handleSaveImage}
