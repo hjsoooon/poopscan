@@ -11,7 +11,7 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
   const [isSaving, setIsSaving] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
 
-  // 분석 결과 이미지 생성
+  // 분석 결과 이미지 생성 (고화질)
   const createResultImage = async (): Promise<Blob> => {
     return new Promise((resolve, reject) => {
       const img = new Image();
@@ -24,16 +24,31 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
           return;
         }
 
-        const imgWidth = Math.min(img.width, 1080);
+        // 고화질을 위해 스케일 팩터 적용 (2x)
+        const scale = 2;
+        
+        // 원본 이미지 크기 유지 (최소 1200px, 최대 2400px)
+        const baseWidth = Math.max(Math.min(img.width, 2400), 1200);
+        const imgWidth = baseWidth;
         const imgHeight = (img.height / img.width) * imgWidth;
-        const infoHeight = 400;
+        const infoHeight = 500 * scale;
         
         canvas.width = imgWidth;
         canvas.height = imgHeight + infoHeight;
 
+        // 이미지 스무딩 품질 향상
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+
         ctx.fillStyle = '#FFFFFF';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // 원본 이미지 고화질 렌더링
         ctx.drawImage(img, 0, 0, imgWidth, imgHeight);
+
+        // 스케일에 맞춰 폰트 크기 조정
+        const fontSize = (size: number) => size * (imgWidth / 1200);
+        const padding = 40 * (imgWidth / 1200);
 
         // 상태 배지
         const statusColors: Record<string, string> = {
@@ -42,34 +57,37 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
           warning: '#EF4444',
         };
         
+        const badgeWidth = 180 * (imgWidth / 1200);
+        const badgeHeight = 56 * (imgWidth / 1200);
+        
         ctx.fillStyle = statusColors[analysis.status] || '#6B7280';
         ctx.beginPath();
-        ctx.roundRect(imgWidth / 2 - 60, 20, 120, 36, 18);
+        ctx.roundRect(imgWidth / 2 - badgeWidth / 2, 30 * (imgWidth / 1200), badgeWidth, badgeHeight, badgeHeight / 2);
         ctx.fill();
         
         ctx.fillStyle = '#FFFFFF';
-        ctx.font = 'bold 16px sans-serif';
+        ctx.font = `bold ${fontSize(24)}px -apple-system, BlinkMacSystemFont, sans-serif`;
         ctx.textAlign = 'center';
-        ctx.fillText(analysis.statusLabel, imgWidth / 2, 45);
+        ctx.fillText(analysis.statusLabel, imgWidth / 2, 30 * (imgWidth / 1200) + badgeHeight * 0.65);
 
-        const infoY = imgHeight + 30;
+        const infoY = imgHeight + padding * 1.5;
         ctx.textAlign = 'left';
 
         // 헤드라인
         ctx.fillStyle = '#1F2937';
-        ctx.font = 'bold 20px sans-serif';
+        ctx.font = `bold ${fontSize(32)}px -apple-system, BlinkMacSystemFont, sans-serif`;
         const summaryText = analysis.summaryLine.replace(/[^\w\sㄱ-힣.,!?]/g, '');
-        ctx.fillText(summaryText.slice(0, 30), 24, infoY);
+        ctx.fillText(summaryText.slice(0, 35), padding, infoY);
         
         ctx.fillStyle = '#9CA3AF';
-        ctx.font = '13px sans-serif';
-        ctx.fillText(analysis.analysisTime, 24, infoY + 25);
+        ctx.font = `${fontSize(20)}px -apple-system, BlinkMacSystemFont, sans-serif`;
+        ctx.fillText(analysis.analysisTime, padding, infoY + fontSize(36));
 
         // 분석 결과
-        const gridY = infoY + 60;
+        const gridY = infoY + fontSize(80);
         ctx.fillStyle = '#1F2937';
-        ctx.font = 'bold 14px sans-serif';
-        ctx.fillText('분석 결과', 24, gridY);
+        ctx.font = `bold ${fontSize(22)}px -apple-system, BlinkMacSystemFont, sans-serif`;
+        ctx.fillText('📋 분석 결과', padding, gridY);
 
         const metrics = [
           { label: '굳기', value: analysis.firmness },
@@ -77,51 +95,80 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
           { label: '색상', value: analysis.colorCategory },
         ];
 
-        ctx.font = '13px sans-serif';
+        const colWidth = (imgWidth - padding * 2) / 3;
         metrics.forEach((item, idx) => {
-          const x = 24 + idx * ((imgWidth - 48) / 3);
-          const y = gridY + 30;
+          const x = padding + idx * colWidth;
+          const y = gridY + fontSize(45);
           ctx.fillStyle = '#6B7280';
+          ctx.font = `${fontSize(18)}px -apple-system, BlinkMacSystemFont, sans-serif`;
           ctx.fillText(item.label, x, y);
           ctx.fillStyle = '#1F2937';
-          ctx.font = 'bold 15px sans-serif';
-          ctx.fillText(item.value, x, y + 20);
-          ctx.font = '13px sans-serif';
+          ctx.font = `bold ${fontSize(24)}px -apple-system, BlinkMacSystemFont, sans-serif`;
+          ctx.fillText(item.value, x, y + fontSize(32));
         });
 
         // 특이소견
+        let currentY = gridY + fontSize(120);
         if (analysis.specialFindings.length > 0) {
-          ctx.fillStyle = '#1F2937';
-          ctx.font = 'bold 14px sans-serif';
-          ctx.fillText('특이소견', 24, gridY + 80);
-          ctx.font = '13px sans-serif';
-          ctx.fillStyle = '#6B7280';
-          ctx.fillText(analysis.specialFindings.join(', '), 24, gridY + 100);
+          ctx.fillStyle = '#EA580C';
+          ctx.font = `bold ${fontSize(20)}px -apple-system, BlinkMacSystemFont, sans-serif`;
+          ctx.fillText('⚠️ 특이소견: ' + analysis.specialFindings.join(', '), padding, currentY);
+          currentY += fontSize(40);
         }
 
-        // 다음 행동
+        // 케어 가이드
         ctx.fillStyle = '#1F2937';
-        ctx.font = 'bold 14px sans-serif';
-        ctx.fillText('케어 가이드', 24, gridY + 140);
-        ctx.font = '13px sans-serif';
-        ctx.fillStyle = '#6B7280';
+        ctx.font = `bold ${fontSize(22)}px -apple-system, BlinkMacSystemFont, sans-serif`;
+        ctx.fillText('💡 케어 가이드', padding, currentY);
         
-        let actionY = gridY + 165;
+        ctx.font = `${fontSize(18)}px -apple-system, BlinkMacSystemFont, sans-serif`;
+        ctx.fillStyle = '#4B5563';
+        
+        currentY += fontSize(35);
         analysis.nextActions.slice(0, 2).forEach(action => {
-          ctx.fillText('• ' + action, 24, actionY);
-          actionY += 20;
+          ctx.fillText('• ' + action, padding, currentY);
+          currentY += fontSize(30);
         });
+
+        // AI 코멘트
+        currentY += fontSize(20);
+        ctx.fillStyle = '#1F2937';
+        ctx.font = `bold ${fontSize(20)}px -apple-system, BlinkMacSystemFont, sans-serif`;
+        ctx.fillText('🤖 AI 코멘트', padding, currentY);
+        
+        ctx.font = `${fontSize(16)}px -apple-system, BlinkMacSystemFont, sans-serif`;
+        ctx.fillStyle = '#6B7280';
+        currentY += fontSize(30);
+        
+        // AI 인사이트 줄바꿈 처리
+        const maxLineWidth = imgWidth - padding * 2;
+        const words = analysis.aiInsight.split(' ');
+        let line = '';
+        for (const word of words) {
+          const testLine = line + word + ' ';
+          if (ctx.measureText(testLine).width > maxLineWidth && line !== '') {
+            ctx.fillText(line.trim(), padding, currentY);
+            line = word + ' ';
+            currentY += fontSize(24);
+          } else {
+            line = testLine;
+          }
+        }
+        if (line) {
+          ctx.fillText(line.trim(), padding, currentY);
+        }
 
         // 면책 조항
         ctx.fillStyle = '#9CA3AF';
-        ctx.font = '10px sans-serif';
+        ctx.font = `${fontSize(14)}px -apple-system, BlinkMacSystemFont, sans-serif`;
         ctx.textAlign = 'center';
-        ctx.fillText('⚠️ 참고용 정보이며, 정확한 진단은 전문의와 상담하세요.', imgWidth / 2, canvas.height - 15);
+        ctx.fillText('⚠️ 참고용 정보이며, 정확한 진단은 전문의와 상담하세요.', imgWidth / 2, canvas.height - padding);
 
+        // PNG 포맷으로 고화질 저장
         canvas.toBlob((blob) => {
           if (blob) resolve(blob);
           else reject(new Error('Failed to create blob'));
-        }, 'image/jpeg', 0.9);
+        }, 'image/png');
       };
       
       img.onerror = () => reject(new Error('Failed to load image'));
@@ -134,10 +181,10 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
     try {
       const blob = await createResultImage();
       const timestamp = new Date().toISOString().slice(0, 10);
-      const filename = `poopscan_${timestamp}.jpg`;
+      const filename = `poopscan_${timestamp}.png`;
 
       if (navigator.share && navigator.canShare) {
-        const file = new File([blob], filename, { type: 'image/jpeg' });
+        const file = new File([blob], filename, { type: 'image/png' });
         if (navigator.canShare({ files: [file] })) {
           await navigator.share({ files: [file], title: 'PoopScan AI 분석 결과' });
           setIsSaving(false);
@@ -166,8 +213,8 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
     try {
       const blob = await createResultImage();
       const timestamp = new Date().toISOString().slice(0, 10);
-      const filename = `poopscan_${timestamp}.jpg`;
-      const file = new File([blob], filename, { type: 'image/jpeg' });
+      const filename = `poopscan_${timestamp}.png`;
+      const file = new File([blob], filename, { type: 'image/png' });
 
       if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({ files: [file] });
