@@ -9,6 +9,7 @@ export interface WarningCheck {
   question: string;
   isAlert: boolean;
   detail?: string;
+  type: 'ai' | 'parent';  // 'ai': AI가 분석한 결과, 'parent': 부모가 확인해야 할 사항
 }
 
 // 7일 추세 데이터

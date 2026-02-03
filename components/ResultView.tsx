@@ -10,22 +10,30 @@ interface ResultViewProps {
 const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => {
   const [isSaving, setIsSaving] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
-  // 주의 신호 체크리스트 상태 (부모가 직접 체크)
-  const [checkedWarnings, setCheckedWarnings] = useState<boolean[]>(
-    new Array(analysis.warningChecks.length).fill(false)
+  
+  // AI 분석 결과와 부모 확인 사항 분리
+  const aiChecks = analysis.warningChecks.filter(w => w.type === 'ai');
+  const parentChecks = analysis.warningChecks.filter(w => w.type === 'parent');
+  
+  // 부모 확인 체크리스트 상태
+  const [checkedParentItems, setCheckedParentItems] = useState<boolean[]>(
+    new Array(parentChecks.length).fill(false)
   );
 
-  const toggleWarningCheck = (idx: number) => {
-    setCheckedWarnings(prev => {
+  const toggleParentCheck = (idx: number) => {
+    setCheckedParentItems(prev => {
       const newChecked = [...prev];
       newChecked[idx] = !newChecked[idx];
       return newChecked;
     });
   };
 
-  // 체크된 항목 중 주의가 필요한 것 개수
-  const checkedAlertCount = analysis.warningChecks.filter(
-    (w, idx) => checkedWarnings[idx] && w.isAlert
+  // AI 분석에서 주의가 필요한 항목 개수
+  const aiAlertCount = aiChecks.filter(w => w.isAlert).length;
+  
+  // 부모 체크에서 주의가 필요한 항목 개수 (체크된 것 중)
+  const parentAlertCount = parentChecks.filter(
+    (w, idx) => checkedParentItems[idx] && w.isAlert
   ).length;
 
   // 캔버스로 리포트 이미지 생성 (큰 텍스트)
@@ -447,100 +455,150 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
           </div>
         </div>
 
-        {/* ========== 3. 주의 신호 체크리스트 (부모가 직접 체크) ========== */}
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-          <div className="px-4 py-3 bg-gray-50 border-b border-gray-100">
-            <div className="flex items-center justify-between mb-1">
-              <h3 className="text-sm font-bold flex items-center gap-2">
-                <i className="fa-solid fa-clipboard-check text-yellow-500"></i>
-                주의 신호 체크리스트
-              </h3>
-              {checkedAlertCount > 0 ? (
-                <span className="bg-red-100 text-red-700 text-xs font-bold px-2 py-0.5 rounded-full">
-                  {checkedAlertCount}개 해당
-                </span>
-              ) : checkedWarnings.some(c => c) ? (
-                <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-0.5 rounded-full">
-                  양호
-                </span>
-              ) : null}
+        {/* ========== 3-1. AI 분석 결과 ========== */}
+        {aiChecks.length > 0 && (
+          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+            <div className="px-4 py-3 bg-blue-50 border-b border-blue-100">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-bold flex items-center gap-2 text-blue-800">
+                  <i className="fa-solid fa-robot text-blue-500"></i>
+                  AI 분석 결과
+                </h3>
+                {aiAlertCount > 0 ? (
+                  <span className="bg-red-100 text-red-700 text-xs font-bold px-2 py-0.5 rounded-full">
+                    {aiAlertCount}개 주의
+                  </span>
+                ) : (
+                  <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-0.5 rounded-full">
+                    이상 없음
+                  </span>
+                )}
+              </div>
             </div>
-            <p className="text-xs text-gray-500">해당하는 항목을 체크해 주세요</p>
-          </div>
-          
-          <div className="divide-y divide-gray-100">
-            {analysis.warningChecks.map((check, idx) => {
-              const isChecked = checkedWarnings[idx];
-              const showAlert = isChecked && check.isAlert;
-              
-              return (
-                <button
-                  key={idx}
-                  onClick={() => toggleWarningCheck(idx)}
-                  className={`w-full px-4 py-3.5 flex items-start gap-3 text-left transition-colors ${
-                    showAlert ? 'bg-red-50' : isChecked ? 'bg-green-50' : 'bg-white hover:bg-gray-50'
+            
+            <div className="divide-y divide-gray-50">
+              {aiChecks.map((check, idx) => (
+                <div 
+                  key={idx} 
+                  className={`px-4 py-3 flex items-start gap-3 ${
+                    check.isAlert ? 'bg-red-50' : ''
                   }`}
                 >
-                  {/* 체크박스 */}
-                  <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center shrink-0 transition-all ${
-                    isChecked 
-                      ? showAlert 
-                        ? 'bg-red-500 border-red-500' 
-                        : 'bg-green-500 border-green-500'
-                      : 'border-gray-300 bg-white'
+                  <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${
+                    check.isAlert ? 'bg-red-500' : 'bg-green-500'
                   }`}>
-                    {isChecked && (
-                      <i className="fa-solid fa-check text-white text-xs"></i>
-                    )}
+                    <i className={`fa-solid ${check.isAlert ? 'fa-exclamation' : 'fa-check'} text-white text-[10px]`}></i>
                   </div>
-                  
-                  {/* 질문 텍스트 */}
-                  <div className="flex-1 pt-0.5">
-                    <p className={`text-sm ${
-                      showAlert ? 'text-red-700 font-medium' : isChecked ? 'text-green-700' : 'text-gray-700'
-                    }`}>
+                  <div className="flex-1">
+                    <p className={`text-sm ${check.isAlert ? 'text-red-700 font-medium' : 'text-gray-700'}`}>
                       {check.question}
                     </p>
-                    {showAlert && check.detail && (
-                      <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1">
-                        <i className="fa-solid fa-circle-info"></i>
-                        {check.detail}
-                      </p>
+                    {check.isAlert && check.detail && (
+                      <p className="text-xs text-red-500 mt-1">{check.detail}</p>
                     )}
                   </div>
-                  
-                  {/* 주의 표시 */}
-                  {check.isAlert && (
-                    <span className={`text-xs px-2 py-0.5 rounded-full shrink-0 ${
-                      isChecked ? 'bg-red-200 text-red-700' : 'bg-gray-100 text-gray-500'
-                    }`}>
-                      주의
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-          
-          {/* 체크 완료 시 안내 */}
-          {checkedWarnings.every(c => c) && (
-            <div className={`px-4 py-3 border-t ${
-              checkedAlertCount > 0 ? 'bg-red-50 border-red-100' : 'bg-green-50 border-green-100'
-            }`}>
-              {checkedAlertCount > 0 ? (
-                <p className="text-sm text-red-700 flex items-center gap-2">
-                  <i className="fa-solid fa-triangle-exclamation"></i>
-                  <span><strong>{checkedAlertCount}개</strong> 항목에 주의가 필요해요</span>
-                </p>
-              ) : (
-                <p className="text-sm text-green-700 flex items-center gap-2">
-                  <i className="fa-solid fa-circle-check"></i>
-                  <span>모든 항목이 정상이에요!</span>
-                </p>
-              )}
+                </div>
+              ))}
             </div>
-          )}
-        </div>
+          </div>
+        )}
+
+        {/* ========== 3-2. 부모 확인 체크리스트 ========== */}
+        {parentChecks.length > 0 && (
+          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+            <div className="px-4 py-3 bg-yellow-50 border-b border-yellow-100">
+              <div className="flex items-center justify-between mb-1">
+                <h3 className="text-sm font-bold flex items-center gap-2 text-yellow-800">
+                  <i className="fa-solid fa-clipboard-check text-yellow-600"></i>
+                  부모님 확인 사항
+                </h3>
+                {parentAlertCount > 0 ? (
+                  <span className="bg-red-100 text-red-700 text-xs font-bold px-2 py-0.5 rounded-full">
+                    {parentAlertCount}개 해당
+                  </span>
+                ) : checkedParentItems.some(c => c) ? (
+                  <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-0.5 rounded-full">
+                    양호
+                  </span>
+                ) : null}
+              </div>
+              <p className="text-xs text-yellow-700">해당하는 항목을 체크해 주세요</p>
+            </div>
+            
+            <div className="divide-y divide-gray-100">
+              {parentChecks.map((check, idx) => {
+                const isChecked = checkedParentItems[idx];
+                const showAlert = isChecked && check.isAlert;
+                
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => toggleParentCheck(idx)}
+                    className={`w-full px-4 py-3.5 flex items-start gap-3 text-left transition-colors ${
+                      showAlert ? 'bg-red-50' : isChecked ? 'bg-green-50' : 'bg-white hover:bg-gray-50'
+                    }`}
+                  >
+                    {/* 체크박스 */}
+                    <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center shrink-0 transition-all ${
+                      isChecked 
+                        ? showAlert 
+                          ? 'bg-red-500 border-red-500' 
+                          : 'bg-green-500 border-green-500'
+                        : 'border-gray-300 bg-white'
+                    }`}>
+                      {isChecked && (
+                        <i className="fa-solid fa-check text-white text-xs"></i>
+                      )}
+                    </div>
+                    
+                    {/* 질문 텍스트 */}
+                    <div className="flex-1 pt-0.5">
+                      <p className={`text-sm ${
+                        showAlert ? 'text-red-700 font-medium' : isChecked ? 'text-green-700' : 'text-gray-700'
+                      }`}>
+                        {check.question}
+                      </p>
+                      {showAlert && check.detail && (
+                        <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1">
+                          <i className="fa-solid fa-circle-info"></i>
+                          {check.detail}
+                        </p>
+                      )}
+                    </div>
+                    
+                    {/* 주의 표시 */}
+                    {check.isAlert && (
+                      <span className={`text-xs px-2 py-0.5 rounded-full shrink-0 ${
+                        isChecked ? 'bg-red-200 text-red-700' : 'bg-gray-100 text-gray-500'
+                      }`}>
+                        주의
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+            
+            {/* 체크 완료 시 안내 */}
+            {checkedParentItems.every(c => c) && (
+              <div className={`px-4 py-3 border-t ${
+                parentAlertCount > 0 ? 'bg-red-50 border-red-100' : 'bg-green-50 border-green-100'
+              }`}>
+                {parentAlertCount > 0 ? (
+                  <p className="text-sm text-red-700 flex items-center gap-2">
+                    <i className="fa-solid fa-triangle-exclamation"></i>
+                    <span><strong>{parentAlertCount}개</strong> 항목에 주의가 필요해요</span>
+                  </p>
+                ) : (
+                  <p className="text-sm text-green-700 flex items-center gap-2">
+                    <i className="fa-solid fa-circle-check"></i>
+                    <span>모든 항목이 정상이에요!</span>
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* ========== 4. 추세 (7일 그래프) ========== */}
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
