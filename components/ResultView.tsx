@@ -386,36 +386,36 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
 
         {/* ========== 2. 분석 결과 (통합) ========== */}
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-          <div className="px-4 py-3.5 bg-white border-b border-gray-100 flex items-center justify-between">
+          <div className="px-3 py-2.5 bg-white border-b border-gray-100 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <i className="fa-solid fa-robot text-blue-500 text-xl"></i>
-              <h3 className="text-lg font-bold text-gray-800">AI 분석 결과</h3>
+              <i className="fa-solid fa-robot text-blue-500"></i>
+              <h3 className="text-sm font-bold text-gray-800">AI 분석 결과</h3>
             </div>
             {aiAlertCount > 0 ? (
-              <span className="bg-red-100 text-red-700 text-sm font-bold px-3 py-1 rounded-full">
+              <span className="bg-red-100 text-red-700 text-xs font-bold px-2 py-0.5 rounded-full">
                 {aiAlertCount}개 주의
               </span>
             ) : (
-              <span className="bg-green-100 text-green-700 text-sm font-bold px-3 py-1 rounded-full">
+              <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-0.5 rounded-full">
                 이상 없음
               </span>
             )}
           </div>
           
-          <div className="p-4 space-y-5">
+          <div className="p-3 space-y-3">
             {/* 굳기 */}
             <div>
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-base font-medium text-gray-600">굳기</span>
-                <span className="text-base font-bold text-gray-800">{analysis.firmness}</span>
+              <div className="flex justify-between items-center mb-1.5">
+                <span className="text-sm font-medium text-gray-600">굳기</span>
+                <span className="text-sm font-bold text-gray-800">{analysis.firmness}</span>
               </div>
-              <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+              <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
                 <div 
                   className="h-full bg-gradient-to-r from-amber-400 via-green-400 to-blue-400 rounded-full transition-all"
                   style={{ width: `${firmnessPercent}%` }}
                 ></div>
               </div>
-              <div className="flex justify-between text-sm text-gray-400 mt-1.5">
+              <div className="flex justify-between text-xs text-gray-400 mt-1">
                 <span>딱딱</span>
                 <span>정상</span>
                 <span>묽음</span>
@@ -423,36 +423,36 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
             </div>
 
             {/* 양 & 색상 */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-gray-50 rounded-xl p-4">
-                <p className="text-sm text-gray-500 mb-1">양</p>
-                <p className="font-bold text-gray-800 text-xl">{analysis.amount}</p>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="bg-gray-50 rounded-lg p-3">
+                <p className="text-xs text-gray-500 mb-0.5">양</p>
+                <p className="font-bold text-gray-800 text-base">{analysis.amount}</p>
               </div>
-              <div className="bg-gray-50 rounded-xl p-4">
-                <p className="text-sm text-gray-500 mb-1">색상</p>
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 rounded-full border border-gray-200" style={{ backgroundColor: analysis.colorHex }}></div>
-                  <p className="font-bold text-gray-800 text-xl">{analysis.colorCategory}</p>
+              <div className="bg-gray-50 rounded-lg p-3">
+                <p className="text-xs text-gray-500 mb-0.5">색상</p>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-4 h-4 rounded-full border border-gray-200" style={{ backgroundColor: analysis.colorHex }}></div>
+                  <p className="font-bold text-gray-800 text-base">{analysis.colorCategory}</p>
                 </div>
               </div>
             </div>
 
             {/* AI 체크 항목 */}
             {aiChecks.length > 0 && (
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 {aiChecks.map((check, idx) => (
                   <div 
                     key={idx} 
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl ${
+                    className={`flex items-center gap-2.5 px-3 py-2 rounded-lg ${
                       check.isAlert ? 'bg-red-50' : 'bg-gray-50'
                     }`}
                   >
-                    <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${
+                    <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
                       check.isAlert ? 'bg-red-500' : 'bg-green-500'
                     }`}>
-                      <i className={`fa-solid ${check.isAlert ? 'fa-exclamation' : 'fa-check'} text-white text-xs`}></i>
+                      <i className={`fa-solid ${check.isAlert ? 'fa-exclamation' : 'fa-check'} text-white text-[10px]`}></i>
                     </div>
-                    <p className={`text-base flex-1 ${check.isAlert ? 'text-red-700 font-medium' : 'text-gray-700'}`}>
+                    <p className={`text-sm flex-1 ${check.isAlert ? 'text-red-700 font-medium' : 'text-gray-700'}`}>
                       {check.question}
                     </p>
                   </div>
@@ -462,22 +462,22 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
 
             {/* 특이소견 */}
             {analysis.specialFindings.length > 0 ? (
-              <div className="bg-orange-50 rounded-xl p-4">
-                <p className="text-sm font-bold text-orange-700 mb-2">
+              <div className="bg-orange-50 rounded-lg p-3">
+                <p className="text-xs font-bold text-orange-700 mb-1">
                   <i className="fa-solid fa-magnifying-glass mr-1"></i>
                   특이소견
                 </p>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5">
                   {analysis.specialFindings.map((finding, idx) => (
-                    <span key={idx} className="bg-orange-100 text-orange-700 px-3 py-1.5 rounded-full text-base font-medium">
+                    <span key={idx} className="bg-orange-100 text-orange-700 px-2.5 py-1 rounded-full text-sm">
                       {finding}
                     </span>
                   ))}
                 </div>
               </div>
             ) : (
-              <div className="bg-green-50 rounded-xl p-4">
-                <p className="text-base text-green-700">
+              <div className="bg-green-50 rounded-lg p-3">
+                <p className="text-sm text-green-700">
                   <i className="fa-solid fa-circle-check mr-1"></i>
                   특이소견 없음
                 </p>
