@@ -384,11 +384,22 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
           </div>
         </div>
 
-        {/* ========== 2. 분석 (굳기/양/색/특이소견) ========== */}
+        {/* ========== 2. 분석 결과 (통합) ========== */}
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-          <div className="px-3 py-2.5 bg-white border-b border-gray-100 flex items-center gap-2">
-            <i className="fa-solid fa-clipboard-list text-blue-500"></i>
-            <h3 className="text-sm font-bold text-gray-800">분석 결과</h3>
+          <div className="px-3 py-2.5 bg-white border-b border-gray-100 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <i className="fa-solid fa-clipboard-list text-blue-500"></i>
+              <h3 className="text-sm font-bold text-gray-800">분석 결과</h3>
+            </div>
+            {aiAlertCount > 0 ? (
+              <span className="bg-red-100 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                {aiAlertCount}개 주의
+              </span>
+            ) : (
+              <span className="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                이상 없음
+              </span>
+            )}
           </div>
           
           <div className="p-3 space-y-3">
@@ -426,6 +437,29 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
               </div>
             </div>
 
+            {/* AI 체크 항목 */}
+            {aiChecks.length > 0 && (
+              <div className="space-y-1.5">
+                {aiChecks.map((check, idx) => (
+                  <div 
+                    key={idx} 
+                    className={`flex items-center gap-2 px-2.5 py-2 rounded-lg ${
+                      check.isAlert ? 'bg-red-50' : 'bg-gray-50'
+                    }`}
+                  >
+                    <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${
+                      check.isAlert ? 'bg-red-500' : 'bg-green-500'
+                    }`}>
+                      <i className={`fa-solid ${check.isAlert ? 'fa-exclamation' : 'fa-check'} text-white text-[8px]`}></i>
+                    </div>
+                    <p className={`text-xs flex-1 ${check.isAlert ? 'text-red-700 font-medium' : 'text-gray-600'}`}>
+                      {check.question}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+
             {/* 특이소견 */}
             {analysis.specialFindings.length > 0 ? (
               <div className="bg-orange-50 rounded-lg p-2.5">
@@ -451,52 +485,6 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
             )}
           </div>
         </div>
-
-        {/* ========== 3-1. AI 분석 결과 ========== */}
-        {aiChecks.length > 0 && (
-          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-            <div className="px-3 py-2.5 bg-white border-b border-gray-100 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <i className="fa-solid fa-robot text-blue-500"></i>
-                <h3 className="text-sm font-bold text-gray-800">AI 분석 결과</h3>
-              </div>
-              {aiAlertCount > 0 ? (
-                <span className="bg-red-100 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded-full">
-                  {aiAlertCount}개 주의
-                </span>
-              ) : (
-                <span className="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-full">
-                  이상 없음
-                </span>
-              )}
-            </div>
-            
-            <div className="divide-y divide-gray-50">
-              {aiChecks.map((check, idx) => (
-                <div 
-                  key={idx} 
-                  className={`px-3 py-2.5 flex items-start gap-2.5 ${
-                    check.isAlert ? 'bg-red-50' : ''
-                  }`}
-                >
-                  <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${
-                    check.isAlert ? 'bg-red-500' : 'bg-green-500'
-                  }`}>
-                    <i className={`fa-solid ${check.isAlert ? 'fa-exclamation' : 'fa-check'} text-white text-[8px]`}></i>
-                  </div>
-                  <div className="flex-1">
-                    <p className={`text-xs ${check.isAlert ? 'text-red-700 font-medium' : 'text-gray-700'}`}>
-                      {check.question}
-                    </p>
-                    {check.isAlert && check.detail && (
-                      <p className="text-[10px] text-red-500 mt-0.5">{check.detail}</p>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* ========== 3-2. 부모 확인 체크리스트 ========== */}
         {parentChecks.length > 0 && (
