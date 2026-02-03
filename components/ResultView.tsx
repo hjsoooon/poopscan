@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import html2canvas from 'html2canvas';
 import { PoopAnalysisResult } from '../types';
 
 interface ResultViewProps {
@@ -10,169 +11,27 @@ interface ResultViewProps {
 const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => {
   const [isSaving, setIsSaving] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
+  const reportRef = useRef<HTMLDivElement>(null);
 
-  // 분석 결과 이미지 생성 (고화질)
+  // 화면 그대로 캡처
   const createResultImage = async (): Promise<Blob> => {
+    if (!reportRef.current) {
+      throw new Error('Report element not found');
+    }
+
+    const canvas = await html2canvas(reportRef.current, {
+      scale: 2, // 고화질을 위해 2배 스케일
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#F9FAFB',
+      logging: false,
+    });
+
     return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        if (!ctx) {
-          reject(new Error('Canvas context not available'));
-          return;
-        }
-
-        // 고화질을 위해 스케일 팩터 적용 (2x)
-        const scale = 2;
-        
-        // 원본 이미지 크기 유지 (최소 1200px, 최대 2400px)
-        const baseWidth = Math.max(Math.min(img.width, 2400), 1200);
-        const imgWidth = baseWidth;
-        const imgHeight = (img.height / img.width) * imgWidth;
-        const infoHeight = 500 * scale;
-        
-        canvas.width = imgWidth;
-        canvas.height = imgHeight + infoHeight;
-
-        // 이미지 스무딩 품질 향상
-        ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = 'high';
-
-        ctx.fillStyle = '#FFFFFF';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        // 원본 이미지 고화질 렌더링
-        ctx.drawImage(img, 0, 0, imgWidth, imgHeight);
-
-        // 스케일에 맞춰 폰트 크기 조정
-        const fontSize = (size: number) => size * (imgWidth / 1200);
-        const padding = 40 * (imgWidth / 1200);
-
-        // 상태 배지
-        const statusColors: Record<string, string> = {
-          normal: '#22C55E',
-          caution: '#F59E0B',
-          warning: '#EF4444',
-        };
-        
-        const badgeWidth = 180 * (imgWidth / 1200);
-        const badgeHeight = 56 * (imgWidth / 1200);
-        
-        ctx.fillStyle = statusColors[analysis.status] || '#6B7280';
-        ctx.beginPath();
-        ctx.roundRect(imgWidth / 2 - badgeWidth / 2, 30 * (imgWidth / 1200), badgeWidth, badgeHeight, badgeHeight / 2);
-        ctx.fill();
-        
-        ctx.fillStyle = '#FFFFFF';
-        ctx.font = `bold ${fontSize(24)}px -apple-system, BlinkMacSystemFont, sans-serif`;
-        ctx.textAlign = 'center';
-        ctx.fillText(analysis.statusLabel, imgWidth / 2, 30 * (imgWidth / 1200) + badgeHeight * 0.65);
-
-        const infoY = imgHeight + padding * 1.5;
-        ctx.textAlign = 'left';
-
-        // 헤드라인
-        ctx.fillStyle = '#1F2937';
-        ctx.font = `bold ${fontSize(32)}px -apple-system, BlinkMacSystemFont, sans-serif`;
-        const summaryText = analysis.summaryLine.replace(/[^\w\sㄱ-힣.,!?]/g, '');
-        ctx.fillText(summaryText.slice(0, 35), padding, infoY);
-        
-        ctx.fillStyle = '#9CA3AF';
-        ctx.font = `${fontSize(20)}px -apple-system, BlinkMacSystemFont, sans-serif`;
-        ctx.fillText(analysis.analysisTime, padding, infoY + fontSize(36));
-
-        // 분석 결과
-        const gridY = infoY + fontSize(80);
-        ctx.fillStyle = '#1F2937';
-        ctx.font = `bold ${fontSize(22)}px -apple-system, BlinkMacSystemFont, sans-serif`;
-        ctx.fillText('📋 분석 결과', padding, gridY);
-
-        const metrics = [
-          { label: '굳기', value: analysis.firmness },
-          { label: '양', value: analysis.amount },
-          { label: '색상', value: analysis.colorCategory },
-        ];
-
-        const colWidth = (imgWidth - padding * 2) / 3;
-        metrics.forEach((item, idx) => {
-          const x = padding + idx * colWidth;
-          const y = gridY + fontSize(45);
-          ctx.fillStyle = '#6B7280';
-          ctx.font = `${fontSize(18)}px -apple-system, BlinkMacSystemFont, sans-serif`;
-          ctx.fillText(item.label, x, y);
-          ctx.fillStyle = '#1F2937';
-          ctx.font = `bold ${fontSize(24)}px -apple-system, BlinkMacSystemFont, sans-serif`;
-          ctx.fillText(item.value, x, y + fontSize(32));
-        });
-
-        // 특이소견
-        let currentY = gridY + fontSize(120);
-        if (analysis.specialFindings.length > 0) {
-          ctx.fillStyle = '#EA580C';
-          ctx.font = `bold ${fontSize(20)}px -apple-system, BlinkMacSystemFont, sans-serif`;
-          ctx.fillText('⚠️ 특이소견: ' + analysis.specialFindings.join(', '), padding, currentY);
-          currentY += fontSize(40);
-        }
-
-        // 케어 가이드
-        ctx.fillStyle = '#1F2937';
-        ctx.font = `bold ${fontSize(22)}px -apple-system, BlinkMacSystemFont, sans-serif`;
-        ctx.fillText('💡 케어 가이드', padding, currentY);
-        
-        ctx.font = `${fontSize(18)}px -apple-system, BlinkMacSystemFont, sans-serif`;
-        ctx.fillStyle = '#4B5563';
-        
-        currentY += fontSize(35);
-        analysis.nextActions.slice(0, 2).forEach(action => {
-          ctx.fillText('• ' + action, padding, currentY);
-          currentY += fontSize(30);
-        });
-
-        // AI 코멘트
-        currentY += fontSize(20);
-        ctx.fillStyle = '#1F2937';
-        ctx.font = `bold ${fontSize(20)}px -apple-system, BlinkMacSystemFont, sans-serif`;
-        ctx.fillText('🤖 AI 코멘트', padding, currentY);
-        
-        ctx.font = `${fontSize(16)}px -apple-system, BlinkMacSystemFont, sans-serif`;
-        ctx.fillStyle = '#6B7280';
-        currentY += fontSize(30);
-        
-        // AI 인사이트 줄바꿈 처리
-        const maxLineWidth = imgWidth - padding * 2;
-        const words = analysis.aiInsight.split(' ');
-        let line = '';
-        for (const word of words) {
-          const testLine = line + word + ' ';
-          if (ctx.measureText(testLine).width > maxLineWidth && line !== '') {
-            ctx.fillText(line.trim(), padding, currentY);
-            line = word + ' ';
-            currentY += fontSize(24);
-          } else {
-            line = testLine;
-          }
-        }
-        if (line) {
-          ctx.fillText(line.trim(), padding, currentY);
-        }
-
-        // 면책 조항
-        ctx.fillStyle = '#9CA3AF';
-        ctx.font = `${fontSize(14)}px -apple-system, BlinkMacSystemFont, sans-serif`;
-        ctx.textAlign = 'center';
-        ctx.fillText('⚠️ 참고용 정보이며, 정확한 진단은 전문의와 상담하세요.', imgWidth / 2, canvas.height - padding);
-
-        // PNG 포맷으로 고화질 저장
-        canvas.toBlob((blob) => {
-          if (blob) resolve(blob);
-          else reject(new Error('Failed to create blob'));
-        }, 'image/png');
-      };
-      
-      img.onerror = () => reject(new Error('Failed to load image'));
-      img.src = image;
+      canvas.toBlob((blob) => {
+        if (blob) resolve(blob);
+        else reject(new Error('Failed to create blob'));
+      }, 'image/png');
     });
   };
 
@@ -301,15 +160,17 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
         <h1 className="flex-1 text-center font-bold text-lg -mr-8">분석 결과</h1>
       </div>
 
-      {/* Demo Banner */}
-      <div className="bg-amber-50 border-b border-amber-100 px-4 py-2">
-        <p className="text-[11px] text-amber-700 text-center">
-          <i className="fa-solid fa-flask mr-1"></i>
-          데모용 임시 데이터입니다
-        </p>
-      </div>
+      {/* 캡처 영역 시작 */}
+      <div ref={reportRef} className="bg-gray-50">
+        {/* Demo Banner */}
+        <div className="bg-amber-50 border-b border-amber-100 px-4 py-2">
+          <p className="text-[11px] text-amber-700 text-center">
+            <i className="fa-solid fa-flask mr-1"></i>
+            데모용 임시 데이터입니다
+          </p>
+        </div>
 
-      <div className="p-4 space-y-4">
+        <div className="p-4 space-y-4">
         
         {/* ========== 사진 (상단 배치) ========== */}
         <div className="relative rounded-2xl overflow-hidden aspect-[4/3] shadow-sm">
@@ -573,31 +434,33 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
           </p>
         </div>
 
-        {/* 버튼 */}
-        <div className="space-y-2 pt-2">
-          <button 
-            onClick={handleSaveImage}
-            disabled={isSaving}
-            className="w-full h-12 bg-gray-900 text-white rounded-xl font-bold flex items-center justify-center gap-2 disabled:opacity-50"
-          >
-            {isSaving ? <i className="fa-solid fa-spinner animate-spin"></i> : <i className="fa-solid fa-download"></i>}
-            {isSaving ? '저장 중...' : '리포트 저장'}
-          </button>
-          <button 
-            onClick={handleShare}
-            disabled={isSharing}
-            className="w-full h-12 bg-white border border-gray-200 text-gray-700 rounded-xl font-bold flex items-center justify-center gap-2 disabled:opacity-50"
-          >
-            {isSharing ? <i className="fa-solid fa-spinner animate-spin"></i> : <i className="fa-solid fa-share-nodes"></i>}
-            {isSharing ? '공유 준비 중...' : '공유하기'}
-          </button>
-        </div>
-
         {/* 면책 조항 */}
-        <p className="text-[10px] text-gray-400 text-center leading-relaxed pt-2">
+        <p className="text-[10px] text-gray-400 text-center leading-relaxed pt-2 pb-4">
           본 서비스는 참고용이며 의료 진단을 대신하지 않습니다.<br/>
           이상 증상 시 소아청소년과 전문의와 상담하세요.
         </p>
+        </div>
+      </div>
+      {/* 캡처 영역 끝 */}
+
+      {/* 버튼 (캡처 영역 외부) */}
+      <div className="px-4 pb-4 space-y-2 bg-gray-50">
+        <button 
+          onClick={handleSaveImage}
+          disabled={isSaving}
+          className="w-full h-12 bg-gray-900 text-white rounded-xl font-bold flex items-center justify-center gap-2 disabled:opacity-50"
+        >
+          {isSaving ? <i className="fa-solid fa-spinner animate-spin"></i> : <i className="fa-solid fa-download"></i>}
+          {isSaving ? '저장 중...' : '리포트 저장'}
+        </button>
+        <button 
+          onClick={handleShare}
+          disabled={isSharing}
+          className="w-full h-12 bg-white border border-gray-200 text-gray-700 rounded-xl font-bold flex items-center justify-center gap-2 disabled:opacity-50"
+        >
+          {isSharing ? <i className="fa-solid fa-spinner animate-spin"></i> : <i className="fa-solid fa-share-nodes"></i>}
+          {isSharing ? '공유 준비 중...' : '공유하기'}
+        </button>
       </div>
     </div>
   );
