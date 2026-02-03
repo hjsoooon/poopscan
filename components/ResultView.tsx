@@ -31,10 +31,8 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
   // AI 분석에서 주의가 필요한 항목 개수
   const aiAlertCount = aiChecks.filter(w => w.isAlert).length;
   
-  // 부모 체크에서 주의가 필요한 항목 개수 (체크된 것 중)
-  const parentAlertCount = parentChecks.filter(
-    (w, idx) => checkedParentItems[idx] && w.isAlert
-  ).length;
+  // 부모 체크에서 체크된 항목 개수 (체크 = "네, 이 증상이 있어요" = 주의 필요)
+  const parentCheckedCount = checkedParentItems.filter(c => c).length;
 
   // 캔버스로 리포트 이미지 생성 (큰 텍스트)
   const createResultImage = async (): Promise<Blob> => {
@@ -512,38 +510,31 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
                   <i className="fa-solid fa-clipboard-check text-yellow-600"></i>
                   부모님 확인 사항
                 </h3>
-                {parentAlertCount > 0 ? (
+                {parentCheckedCount > 0 && (
                   <span className="bg-red-100 text-red-700 text-xs font-bold px-2 py-0.5 rounded-full">
-                    {parentAlertCount}개 해당
+                    {parentCheckedCount}개 해당
                   </span>
-                ) : checkedParentItems.some(c => c) ? (
-                  <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-0.5 rounded-full">
-                    양호
-                  </span>
-                ) : null}
+                )}
               </div>
-              <p className="text-xs text-yellow-700">해당하는 항목을 체크해 주세요</p>
+              <p className="text-xs text-yellow-700">해당하는 증상이 있으면 체크해 주세요</p>
             </div>
             
             <div className="divide-y divide-gray-100">
               {parentChecks.map((check, idx) => {
                 const isChecked = checkedParentItems[idx];
-                const showAlert = isChecked && check.isAlert;
                 
                 return (
                   <button
                     key={idx}
                     onClick={() => toggleParentCheck(idx)}
                     className={`w-full px-4 py-3.5 flex items-start gap-3 text-left transition-colors ${
-                      showAlert ? 'bg-red-50' : isChecked ? 'bg-green-50' : 'bg-white hover:bg-gray-50'
+                      isChecked ? 'bg-red-50' : 'bg-white hover:bg-gray-50'
                     }`}
                   >
                     {/* 체크박스 */}
                     <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center shrink-0 transition-all ${
                       isChecked 
-                        ? showAlert 
-                          ? 'bg-red-500 border-red-500' 
-                          : 'bg-green-500 border-green-500'
+                        ? 'bg-red-500 border-red-500'
                         : 'border-gray-300 bg-white'
                     }`}>
                       {isChecked && (
@@ -554,114 +545,115 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
                     {/* 질문 텍스트 */}
                     <div className="flex-1 pt-0.5">
                       <p className={`text-sm ${
-                        showAlert ? 'text-red-700 font-medium' : isChecked ? 'text-green-700' : 'text-gray-700'
+                        isChecked ? 'text-red-700 font-medium' : 'text-gray-700'
                       }`}>
                         {check.question}
                       </p>
-                      {showAlert && check.detail && (
+                      {isChecked && (
                         <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1">
                           <i className="fa-solid fa-circle-info"></i>
-                          {check.detail}
+                          이 증상이 있다면 주의가 필요해요
                         </p>
                       )}
                     </div>
-                    
-                    {/* 주의 표시 */}
-                    {check.isAlert && (
-                      <span className={`text-xs px-2 py-0.5 rounded-full shrink-0 ${
-                        isChecked ? 'bg-red-200 text-red-700' : 'bg-gray-100 text-gray-500'
-                      }`}>
-                        주의
-                      </span>
-                    )}
                   </button>
                 );
               })}
             </div>
             
-            {/* 체크 완료 시 안내 */}
-            {checkedParentItems.every(c => c) && (
-              <div className={`px-4 py-3 border-t ${
-                parentAlertCount > 0 ? 'bg-red-50 border-red-100' : 'bg-green-50 border-green-100'
-              }`}>
-                {parentAlertCount > 0 ? (
-                  <p className="text-sm text-red-700 flex items-center gap-2">
-                    <i className="fa-solid fa-triangle-exclamation"></i>
-                    <span><strong>{parentAlertCount}개</strong> 항목에 주의가 필요해요</span>
-                  </p>
-                ) : (
-                  <p className="text-sm text-green-700 flex items-center gap-2">
-                    <i className="fa-solid fa-circle-check"></i>
-                    <span>모든 항목이 정상이에요!</span>
-                  </p>
-                )}
-              </div>
-            )}
+            {/* 결과 안내 */}
+            <div className={`px-4 py-3 border-t ${
+              parentCheckedCount > 0 ? 'bg-red-50 border-red-100' : 'bg-green-50 border-green-100'
+            }`}>
+              {parentCheckedCount > 0 ? (
+                <p className="text-sm text-red-700 flex items-center gap-2">
+                  <i className="fa-solid fa-triangle-exclamation"></i>
+                  <span><strong>{parentCheckedCount}개</strong> 증상이 해당돼요. 주의 깊게 관찰해 주세요.</span>
+                </p>
+              ) : (
+                <p className="text-sm text-green-700 flex items-center gap-2">
+                  <i className="fa-solid fa-circle-check"></i>
+                  <span>해당하는 증상이 없어요. 좋아요!</span>
+                </p>
+              )}
+            </div>
           </div>
         )}
 
         {/* ========== 4. 추세 (7일 그래프) ========== */}
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-          <div className="px-4 py-3 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
-            <h3 className="text-sm font-bold flex items-center gap-2">
-              <i className="fa-solid fa-chart-line text-purple-500"></i>
-              7일 추세
+          <div className="px-4 py-3 bg-purple-50 border-b border-purple-100 flex items-center justify-between">
+            <h3 className="text-sm font-bold flex items-center gap-2 text-purple-800">
+              <i className="fa-solid fa-chart-simple text-purple-500"></i>
+              7일 배변 기록
             </h3>
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-purple-600 font-medium">
               평균 {analysis.weeklyAverage.toFixed(1)}회/일
             </span>
           </div>
           
           <div className="p-4">
-            {/* 바 그래프 */}
-            <div className="flex items-end justify-between gap-1 h-24 mb-2">
-              {analysis.weeklyTrend.map((day, idx) => {
-                const maxCount = Math.max(...analysis.weeklyTrend.map(d => d.count), 1);
-                const height = (day.count / maxCount) * 100;
-                const isToday = idx === analysis.weeklyTrend.length - 1;
-                
-                return (
-                  <div key={idx} className="flex-1 flex flex-col items-center">
-                    <span className="text-[10px] text-gray-500 mb-1">{day.count > 0 ? day.count : '-'}</span>
-                    <div 
-                      className={`w-full rounded-t-sm transition-all ${
-                        day.count === 0 ? 'bg-gray-100' :
-                        day.status === 'caution' ? 'bg-yellow-400' :
-                        isToday ? 'bg-blue-500' : 'bg-blue-300'
-                      }`}
-                      style={{ height: `${day.count === 0 ? 8 : Math.max(height, 15)}%` }}
-                    ></div>
-                  </div>
-                );
-              })}
-            </div>
-            
-            {/* 요일 레이블 */}
-            <div className="flex justify-between">
-              {analysis.weeklyTrend.map((day, idx) => {
-                const isToday = idx === analysis.weeklyTrend.length - 1;
-                return (
-                  <div key={idx} className="flex-1 text-center">
-                    <span className={`text-[10px] ${isToday ? 'text-blue-600 font-bold' : 'text-gray-400'}`}>
-                      {isToday ? '오늘' : day.day}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
+            {analysis.weeklyTrend && analysis.weeklyTrend.length > 0 ? (
+              <>
+                {/* 바 그래프 */}
+                <div className="flex items-end justify-between gap-2 h-32 mb-3 px-1">
+                  {analysis.weeklyTrend.map((day, idx) => {
+                    const maxCount = Math.max(...analysis.weeklyTrend.map(d => d.count), 1);
+                    const height = (day.count / maxCount) * 100;
+                    const isToday = idx === analysis.weeklyTrend.length - 1;
+                    
+                    return (
+                      <div key={idx} className="flex-1 flex flex-col items-center">
+                        {/* 횟수 표시 */}
+                        <span className={`text-xs font-bold mb-1 ${
+                          isToday ? 'text-purple-600' : 
+                          day.status === 'caution' ? 'text-yellow-600' : 'text-gray-600'
+                        }`}>
+                          {day.count > 0 ? day.count : '-'}
+                        </span>
+                        {/* 바 */}
+                        <div 
+                          className={`w-full max-w-[28px] rounded-t-md transition-all ${
+                            day.count === 0 ? 'bg-gray-200' :
+                            day.status === 'caution' ? 'bg-gradient-to-t from-yellow-500 to-yellow-400' :
+                            isToday ? 'bg-gradient-to-t from-purple-600 to-purple-400' : 
+                            'bg-gradient-to-t from-purple-400 to-purple-300'
+                          }`}
+                          style={{ 
+                            height: `${day.count === 0 ? 10 : Math.max(height, 20)}%`,
+                            minHeight: day.count === 0 ? '8px' : '16px'
+                          }}
+                        ></div>
+                        {/* 요일 */}
+                        <span className={`text-[11px] mt-2 ${
+                          isToday ? 'text-purple-600 font-bold' : 'text-gray-500'
+                        }`}>
+                          {isToday ? '오늘' : day.day}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
 
-            {/* 요약 */}
-            <div className="mt-4 bg-gray-50 rounded-xl p-3 flex items-center justify-between">
-              <div className="text-center flex-1">
-                <p className="text-2xl font-bold text-blue-600">{analysis.todayCount}</p>
-                <p className="text-[10px] text-gray-500">오늘</p>
+                {/* 요약 카드 */}
+                <div className="mt-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-4 flex items-center justify-around">
+                  <div className="text-center">
+                    <p className="text-3xl font-bold text-purple-600">{analysis.todayCount}</p>
+                    <p className="text-xs text-gray-500 mt-1">오늘 횟수</p>
+                  </div>
+                  <div className="w-px h-12 bg-purple-200"></div>
+                  <div className="text-center">
+                    <p className="text-3xl font-bold text-blue-600">{analysis.weeklyAverage.toFixed(1)}</p>
+                    <p className="text-xs text-gray-500 mt-1">주간 평균</p>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="text-center py-8 text-gray-400">
+                <i className="fa-solid fa-chart-simple text-3xl mb-2"></i>
+                <p className="text-sm">아직 기록된 데이터가 없어요</p>
               </div>
-              <div className="w-px h-8 bg-gray-200"></div>
-              <div className="text-center flex-1">
-                <p className="text-2xl font-bold text-gray-700">{analysis.weeklyAverage.toFixed(1)}</p>
-                <p className="text-[10px] text-gray-500">주간 평균</p>
-              </div>
-            </div>
+            )}
           </div>
         </div>
 
