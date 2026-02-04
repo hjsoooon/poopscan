@@ -14,6 +14,7 @@ const VIEW_TO_HASH: Record<string, string> = {
   analyzing: '#/analyzing', 
   result: '#/result',
   'result-checklist': '#/result-checklist',  // 체크리스트 상호작용
+  'result-save': '#/result-save',  // 저장하기
   'result-share': '#/result-share',  // 공유하기
 };
 
@@ -25,6 +26,7 @@ const HASH_TO_VIEW: Record<string, string> = {
   '#/analyzing': 'analyzing',
   '#/result': 'result',
   '#/result-checklist': 'result',
+  '#/result-save': 'result',
   '#/result-share': 'result',
   '': 'camera',
   '#/': 'camera',

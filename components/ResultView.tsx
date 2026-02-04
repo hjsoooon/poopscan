@@ -205,6 +205,8 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
   };
 
   const handleSaveImage = async () => {
+    // 저장하기 해시 업데이트
+    setHash('result-save');
     setIsSaving(true);
     try {
       const blob = await createResultImage();
