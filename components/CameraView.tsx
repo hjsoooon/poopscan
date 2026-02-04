@@ -5,15 +5,21 @@ interface CameraViewProps {
   onCapture: (imageData: string) => void;
   isProcessing: boolean;
   capturedImage?: string | null;
+  onPermissionChange?: (hasPermission: boolean | null) => void;
 }
 
-const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, capturedImage }) => {
+const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, capturedImage, onPermissionChange }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [isFlashOn, setIsFlashOn] = useState(false);
   const [isFlashSupported, setIsFlashSupported] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
+
+  // 권한 상태 변경 시 부모에게 알림
+  useEffect(() => {
+    onPermissionChange?.(hasPermission);
+  }, [hasPermission, onPermissionChange]);
 
   useEffect(() => {
     if (isProcessing) return; // Don't restart camera if we are processing

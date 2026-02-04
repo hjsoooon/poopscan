@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { AppState, PoopAnalysisResult } from './types';
 import { analyzePoopImage } from './services/geminiService';
 import CameraView from './components/CameraView';
@@ -8,15 +8,19 @@ import ResultView from './components/ResultView';
 // 해시 라우트 매핑
 const VIEW_TO_HASH: Record<string, string> = {
   camera: '#/camera',
+  'camera-ready': '#/camera-ready',  // 카메라 권한 허용됨
+  'permission-denied': '#/permission-denied',  // 카메라 권한 거부됨
   analyzing: '#/analyzing', 
   result: '#/result',
 };
 
 const HASH_TO_VIEW: Record<string, string> = {
   '#/camera': 'camera',
+  '#/camera-ready': 'camera',
+  '#/permission-denied': 'camera',
   '#/analyzing': 'analyzing',
   '#/result': 'result',
-  '': 'camera',  // 기본값
+  '': 'camera',
   '#/': 'camera',
 };
 
@@ -27,8 +31,8 @@ const getViewFromHash = (): string => {
 };
 
 // URL 해시 업데이트
-const setHash = (view: string) => {
-  const newHash = VIEW_TO_HASH[view] || '#/camera';
+const setHash = (hashKey: string) => {
+  const newHash = VIEW_TO_HASH[hashKey] || '#/camera';
   if (window.location.hash !== newHash) {
     window.location.hash = newHash;
   }
@@ -40,6 +44,9 @@ const App: React.FC = () => {
     capturedImage: null,
     analysis: null,
   }));
+  
+  // 카메라 권한 상태 (null: 대기중, true: 허용, false: 거부)
+  const [cameraPermission, setCameraPermission] = useState<boolean | null>(null);
 
   // 해시 변경 감지 (뒤로가기/앞으로가기)
   useEffect(() => {
@@ -67,8 +74,24 @@ const App: React.FC = () => {
 
   // 뷰 변경 시 해시 업데이트
   useEffect(() => {
-    setHash(state.view);
-  }, [state.view]);
+    // 카메라 뷰일 때는 권한 상태에 따라 다른 해시 사용
+    if (state.view === 'camera') {
+      if (cameraPermission === true) {
+        setHash('camera-ready');
+      } else if (cameraPermission === false) {
+        setHash('permission-denied');
+      } else {
+        setHash('camera');
+      }
+    } else {
+      setHash(state.view);
+    }
+  }, [state.view, cameraPermission]);
+
+  // 카메라 권한 상태 변경 핸들러
+  const handlePermissionChange = useCallback((hasPermission: boolean | null) => {
+    setCameraPermission(hasPermission);
+  }, []);
 
   const handleCapture = async (imageData: string) => {
     setState(prev => ({ ...prev, view: 'analyzing', capturedImage: imageData }));
@@ -100,7 +123,8 @@ const App: React.FC = () => {
       {state.view === 'camera' && (
         <CameraView 
           onCapture={handleCapture} 
-          isProcessing={false} 
+          isProcessing={false}
+          onPermissionChange={handlePermissionChange}
         />
       )}
       
