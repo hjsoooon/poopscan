@@ -1,5 +1,6 @@
 
 import React, { useRef, useState, useEffect } from 'react';
+import { setHash } from '../App';
 
 interface CameraViewProps {
   onCapture: (imageData: string) => void;
@@ -98,6 +99,8 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, captur
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // 앨범 선택 해시 업데이트
+      setHash('album-select');
       const reader = new FileReader();
       reader.onload = (event) => {
         if (event.target?.result) {

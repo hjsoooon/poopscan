@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { PoopAnalysisResult } from '../types';
+import { setHash } from '../App';
 
 interface ResultViewProps {
   image: string;
@@ -21,6 +22,8 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
   );
 
   const toggleParentCheck = (idx: number) => {
+    // 체크리스트 상호작용 해시 업데이트
+    setHash('result-checklist');
     setCheckedParentItems(prev => {
       const newChecked = [...prev];
       newChecked[idx] = !newChecked[idx];
@@ -234,6 +237,8 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
   };
 
   const handleShare = async () => {
+    // 공유하기 해시 업데이트
+    setHash('result-share');
     setIsSharing(true);
     try {
       const blob = await createResultImage();

@@ -10,16 +10,22 @@ const VIEW_TO_HASH: Record<string, string> = {
   camera: '#/camera',
   'camera-ready': '#/camera-ready',  // 카메라 권한 허용됨
   'permission-denied': '#/permission-denied',  // 카메라 권한 거부됨
+  'album-select': '#/album-select',  // 앨범에서 사진 선택
   analyzing: '#/analyzing', 
   result: '#/result',
+  'result-checklist': '#/result-checklist',  // 체크리스트 상호작용
+  'result-share': '#/result-share',  // 공유하기
 };
 
 const HASH_TO_VIEW: Record<string, string> = {
   '#/camera': 'camera',
   '#/camera-ready': 'camera',
   '#/permission-denied': 'camera',
+  '#/album-select': 'camera',
   '#/analyzing': 'analyzing',
   '#/result': 'result',
+  '#/result-checklist': 'result',
+  '#/result-share': 'result',
   '': 'camera',
   '#/': 'camera',
 };
@@ -30,9 +36,9 @@ const getViewFromHash = (): string => {
   return HASH_TO_VIEW[hash] || 'camera';
 };
 
-// URL 해시 업데이트
-const setHash = (hashKey: string) => {
-  const newHash = VIEW_TO_HASH[hashKey] || '#/camera';
+// URL 해시 업데이트 (외부에서도 사용 가능)
+export const setHash = (hashKey: string) => {
+  const newHash = VIEW_TO_HASH[hashKey] || hashKey;
   if (window.location.hash !== newHash) {
     window.location.hash = newHash;
   }
