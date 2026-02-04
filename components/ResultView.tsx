@@ -213,6 +213,25 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
       const timestamp = new Date().toISOString().slice(0, 10);
       const filename = `poopscan_${timestamp}.jpg`;
 
+      // PC/데스크톱 환경 감지 (터치 디바이스가 아니거나, 화면이 큰 경우)
+      const isDesktop = !('ontouchstart' in window) || window.innerWidth > 1024;
+
+      // PC 환경: 바로 다운로드
+      if (isDesktop) {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        alert('분석 결과가 저장되었습니다!');
+        setIsSaving(false);
+        return;
+      }
+
+      // 모바일 환경: 공유 API 시도 후 폴백
       if (navigator.share && navigator.canShare) {
         const file = new File([blob], filename, { type: 'image/jpeg' });
         if (navigator.canShare({ files: [file] })) {
@@ -222,6 +241,7 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
         }
       }
 
+      // 폴백: 다운로드
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
