@@ -356,7 +356,10 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
         <button onClick={onReset} className="w-10 h-10 flex items-center justify-center text-amber-700">
           <i className="fa-solid fa-arrow-left text-lg"></i>
         </button>
-        <h1 className="flex-1 text-center font-bold text-lg pr-10 text-amber-800">🐣 분석 결과</h1>
+        <h1 className="flex-1 text-center font-bold text-lg pr-10 text-amber-800 flex items-center justify-center gap-2">
+          <img src="/로고.png" alt="푸스캔" className="w-5 h-5" />
+          분석 결과
+        </h1>
       </div>
 
       {/* 콘텐츠 영역 */}
