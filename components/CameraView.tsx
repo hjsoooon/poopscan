@@ -119,7 +119,7 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, captur
         <div className="px-4 flex justify-between items-center" style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top, 0.75rem))' }}>
           <div className="w-9 h-9"></div>
           <div className="flex items-center gap-2 text-amber-800 font-bold text-sm tracking-tight px-4 py-2 rounded-full bg-white shadow-sm">
-            <img src="/로고.png" alt="푸스캔" className="w-5 h-5" />
+            <img src={`${import.meta.env.BASE_URL}로고.png`} alt="푸스캔" className="w-5 h-5" />
             푸스캔 AI
           </div>
           <button 
@@ -180,7 +180,7 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, captur
             >
               <div className="bg-gradient-to-r from-amber-400 to-orange-400 p-6 text-white text-center">
                 <div className="w-16 h-16 bg-white/30 rounded-2xl flex items-center justify-center mx-auto mb-3">
-                  <img src="/로고.png" alt="푸스캔" className="w-10 h-10" />
+                  <img src={`${import.meta.env.BASE_URL}로고.png`} alt="푸스캔" className="w-10 h-10" />
                 </div>
                 <h2 className="text-xl font-bold">푸스캔 AI</h2>
                 <p className="text-amber-100 text-sm mt-1">아기 기저귀 AI 분석 서비스</p>
@@ -265,7 +265,7 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, captur
               <i className="fa-solid fa-chevron-left text-sm"></i>
             </button>
             <div className="flex items-center gap-2 text-amber-800 font-bold text-sm tracking-tight px-4 py-2 rounded-full bg-white/90 shadow-sm">
-              <img src="/로고.png" alt="푸스캔" className="w-5 h-5" />
+              <img src={`${import.meta.env.BASE_URL}로고.png`} alt="푸스캔" className="w-5 h-5" />
               푸스캔 AI
             </div>
             <button 
@@ -372,7 +372,7 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, captur
               <div className="absolute inset-0 border-4 border-white/20 rounded-full"></div>
               <div className="absolute inset-0 border-4 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
               <div className="absolute inset-0 flex items-center justify-center">
-                 <img src="/로고.png" alt="푸스캔" className="w-10 h-10 animate-bounce" />
+                 <img src={`${import.meta.env.BASE_URL}로고.png`} alt="푸스캔" className="w-10 h-10 animate-bounce" />
               </div>
            </div>
            <h2 className="text-xl font-bold mb-2 tracking-tight">AI가 분석하고 있어요</h2>
@@ -395,7 +395,7 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, captur
             {/* Header */}
             <div className="bg-gradient-to-r from-amber-400 to-orange-400 p-6 text-white text-center">
               <div className="w-16 h-16 bg-white/30 rounded-2xl flex items-center justify-center mx-auto mb-3">
-                <img src="/로고.png" alt="푸스캔" className="w-10 h-10" />
+                <img src={`${import.meta.env.BASE_URL}로고.png`} alt="푸스캔" className="w-10 h-10" />
               </div>
               <h2 className="text-xl font-bold">푸스캔 AI</h2>
               <p className="text-amber-100 text-sm mt-1">아기 기저귀 AI 분석 서비스</p>
