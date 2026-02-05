@@ -376,7 +376,7 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, captur
               </div>
            </div>
            <h2 className="text-xl font-bold mb-2 tracking-tight">AI가 분석하고 있어요</h2>
-           <p className="text-white/80 text-sm text-center px-4">잠시만 기다려 주세요~</p>
+           <p className="text-white/80 text-sm text-center px-4">잠시만 기다려 주세요</p>
            
            {/* Mini Preview of Captured Image */}
            <div className="mt-8 w-16 h-16 rounded-2xl border-2 border-amber-300/50 overflow-hidden shadow-2xl">
