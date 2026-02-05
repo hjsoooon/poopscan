@@ -57,7 +57,17 @@ export interface PoopAnalysisResult {
 }
 
 export interface AppState {
-  view: 'camera' | 'analyzing' | 'result';
+  view: 'camera' | 'analyzing' | 'result' | 'history';
   capturedImage: string | null;
   analysis: PoopAnalysisResult | null;
+}
+
+// 분석 기록 항목
+export interface HistoryItem {
+  id: string;
+  timestamp: number;
+  date: string;
+  time: string;
+  image: string;
+  analysis: PoopAnalysisResult;
 }

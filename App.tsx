@@ -1,9 +1,11 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { AppState, PoopAnalysisResult } from './types';
+import { AppState, PoopAnalysisResult, HistoryItem } from './types';
 import { analyzePoopImage } from './services/geminiService';
+import { saveToHistory, getHistory } from './services/historyStorage';
 import CameraView from './components/CameraView';
 import ResultView from './components/ResultView';
+import HistoryView from './components/HistoryView';
 
 // 해시 라우트 매핑
 const VIEW_TO_HASH: Record<string, string> = {
@@ -16,6 +18,7 @@ const VIEW_TO_HASH: Record<string, string> = {
   'result-checklist': '#/result-checklist',  // 체크리스트 상호작용
   'result-save': '#/result-save',  // 저장하기
   'result-share': '#/result-share',  // 공유하기
+  history: '#/history',  // 분석 기록
 };
 
 const HASH_TO_VIEW: Record<string, string> = {
@@ -28,6 +31,7 @@ const HASH_TO_VIEW: Record<string, string> = {
   '#/result-checklist': 'result',
   '#/result-save': 'result',
   '#/result-share': 'result',
+  '#/history': 'history',
   '': 'camera',
   '#/': 'camera',
 };
@@ -48,13 +52,21 @@ export const setHash = (hashKey: string) => {
 
 const App: React.FC = () => {
   const [state, setState] = useState<AppState>(() => ({
-    view: getViewFromHash() as 'camera' | 'analyzing' | 'result',
+    view: getViewFromHash() as 'camera' | 'analyzing' | 'result' | 'history',
     capturedImage: null,
     analysis: null,
   }));
   
   // 카메라 권한 상태 (null: 대기중, true: 허용, false: 거부)
   const [cameraPermission, setCameraPermission] = useState<boolean | null>(null);
+  
+  // 분석 기록
+  const [history, setHistory] = useState<HistoryItem[]>(() => getHistory());
+  
+  // 기록 새로고침
+  const refreshHistory = useCallback(() => {
+    setHistory(getHistory());
+  }, []);
 
   // 해시 변경 감지 (뒤로가기/앞으로가기)
   useEffect(() => {
@@ -106,6 +118,9 @@ const App: React.FC = () => {
     
     try {
       const result = await analyzePoopImage(imageData);
+      // 분석 결과를 기록에 저장
+      saveToHistory(imageData, result);
+      refreshHistory();
       setState(prev => ({ 
         ...prev, 
         view: 'result', 
@@ -126,6 +141,21 @@ const App: React.FC = () => {
     });
   };
 
+  // 기록 화면으로 이동
+  const handleShowHistory = useCallback(() => {
+    refreshHistory();
+    setState(prev => ({ ...prev, view: 'history' }));
+  }, [refreshHistory]);
+
+  // 기록에서 항목 선택
+  const handleSelectHistoryItem = useCallback((item: HistoryItem) => {
+    setState({
+      view: 'result',
+      capturedImage: item.image,
+      analysis: item.analysis,
+    });
+  }, []);
+
   return (
     <div className="min-h-screen min-h-[100dvh] w-full sm:max-w-lg sm:mx-auto md:shadow-2xl relative bg-gradient-to-b from-amber-50 to-orange-50 flex flex-col overflow-hidden">
       {state.view === 'camera' && (
@@ -133,6 +163,8 @@ const App: React.FC = () => {
           onCapture={handleCapture} 
           isProcessing={false}
           onPermissionChange={handlePermissionChange}
+          onShowHistory={handleShowHistory}
+          historyCount={history.length}
         />
       )}
       
@@ -152,6 +184,15 @@ const App: React.FC = () => {
             onReset={handleReset} 
           />
         </div>
+      )}
+
+      {state.view === 'history' && (
+        <HistoryView
+          history={history}
+          onBack={handleReset}
+          onSelectItem={handleSelectHistoryItem}
+          onHistoryChange={refreshHistory}
+        />
       )}
     </div>
   );

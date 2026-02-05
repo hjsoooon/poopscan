@@ -7,9 +7,11 @@ interface CameraViewProps {
   isProcessing: boolean;
   capturedImage?: string | null;
   onPermissionChange?: (hasPermission: boolean | null) => void;
+  onShowHistory?: () => void;
+  historyCount?: number;
 }
 
-const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, capturedImage, onPermissionChange }) => {
+const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, capturedImage, onPermissionChange, onShowHistory, historyCount = 0 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
@@ -117,7 +119,17 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, captur
       <div className="absolute inset-0 bg-gradient-to-b from-amber-50 to-orange-50 flex flex-col safe-area-inset">
         {/* Header */}
         <div className="px-4 flex justify-between items-center" style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top, 0.75rem))' }}>
-          <div className="w-9 h-9"></div>
+          <button 
+            onClick={onShowHistory}
+            className="relative w-9 h-9 rounded-full bg-white shadow-sm flex items-center justify-center text-amber-600"
+          >
+            <i className="fa-solid fa-clock-rotate-left text-sm"></i>
+            {historyCount > 0 && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-orange-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                {historyCount > 9 ? '9+' : historyCount}
+              </span>
+            )}
+          </button>
           <div className="flex items-center gap-1.5 text-amber-800 font-bold text-sm tracking-tight px-3 py-1.5 rounded-full bg-white shadow-sm">
             <img src={`${import.meta.env.BASE_URL}로고.png`} alt="푸스캔" className="w-6 h-6" />
             푸스캔 AI
@@ -261,8 +273,16 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, captur
         {/* Header Overlay */}
         {!isProcessing && (
           <div className="absolute top-0 left-0 right-0 z-10 px-3 pt-3 flex justify-between items-center">
-            <button className="w-9 h-9 rounded-full bg-white/90 flex items-center justify-center text-amber-700 shadow-sm">
-              <i className="fa-solid fa-chevron-left text-sm"></i>
+            <button 
+              onClick={onShowHistory}
+              className="relative w-9 h-9 rounded-full bg-white/90 flex items-center justify-center text-amber-700 shadow-sm"
+            >
+              <i className="fa-solid fa-clock-rotate-left text-sm"></i>
+              {historyCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-orange-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                  {historyCount > 9 ? '9+' : historyCount}
+                </span>
+              )}
             </button>
             <div className="flex items-center gap-1.5 text-amber-800 font-bold text-sm tracking-tight px-3 py-1.5 rounded-full bg-white/90 shadow-sm">
               <img src={`${import.meta.env.BASE_URL}로고.png`} alt="푸스캔" className="w-6 h-6" />
