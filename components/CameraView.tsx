@@ -118,8 +118,8 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, captur
         {/* Header */}
         <div className="px-4 flex justify-between items-center" style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top, 0.75rem))' }}>
           <div className="w-9 h-9"></div>
-          <div className="flex items-center gap-2 text-amber-800 font-bold text-base tracking-tight px-4 py-2 rounded-full bg-white shadow-sm">
-            <img src={`${import.meta.env.BASE_URL}로고.png`} alt="푸스캔" className="w-8 h-8" />
+          <div className="flex items-center gap-1.5 text-amber-800 font-bold text-sm tracking-tight px-3 py-1.5 rounded-full bg-white shadow-sm">
+            <img src={`${import.meta.env.BASE_URL}로고.png`} alt="푸스캔" className="w-6 h-6" />
             푸스캔 AI
           </div>
           <button 
@@ -264,8 +264,8 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, captur
             <button className="w-9 h-9 rounded-full bg-white/90 flex items-center justify-center text-amber-700 shadow-sm">
               <i className="fa-solid fa-chevron-left text-sm"></i>
             </button>
-            <div className="flex items-center gap-2 text-amber-800 font-bold text-base tracking-tight px-4 py-2 rounded-full bg-white/90 shadow-sm">
-              <img src={`${import.meta.env.BASE_URL}로고.png`} alt="푸스캔" className="w-8 h-8" />
+            <div className="flex items-center gap-1.5 text-amber-800 font-bold text-sm tracking-tight px-3 py-1.5 rounded-full bg-white/90 shadow-sm">
+              <img src={`${import.meta.env.BASE_URL}로고.png`} alt="푸스캔" className="w-6 h-6" />
               푸스캔 AI
             </div>
             <button 
