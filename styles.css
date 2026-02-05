@@ -10,7 +10,7 @@ html {
 body {
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
   -webkit-tap-highlight-color: transparent;
-  background-color: #F8F9FA;
+  background: linear-gradient(to bottom, #FFFBEB, #FFF7ED);
   min-height: 100vh;
   min-height: -webkit-fill-available;
   min-height: 100dvh;
@@ -31,9 +31,9 @@ body {
 }
 
 .scan-line {
-  height: 2px;
-  background: linear-gradient(90deg, transparent, #3B82F6, transparent);
-  box-shadow: 0 0 15px #3B82F6;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #F59E0B, transparent);
+  box-shadow: 0 0 20px #F59E0B;
   animation: scan 2s linear infinite;
 }
 

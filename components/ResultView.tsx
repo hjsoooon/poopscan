@@ -315,28 +315,28 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
   // 기저귀가 아닌 경우
   if (analysis.status === 'invalid') {
     return (
-      <div className="min-h-screen min-h-[100dvh] bg-gray-50 text-gray-900 pb-safe flex flex-col">
-        <div className="sticky top-0 z-20 bg-white px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] flex items-center border-b border-gray-200">
-          <button onClick={onReset} className="w-10 h-10 flex items-center justify-center">
+      <div className="min-h-screen min-h-[100dvh] bg-gradient-to-b from-amber-50 to-orange-50 text-amber-900 pb-safe flex flex-col">
+        <div className="sticky top-0 z-20 bg-white/80 backdrop-blur-md px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] flex items-center border-b border-amber-200/50">
+          <button onClick={onReset} className="w-10 h-10 flex items-center justify-center text-amber-700">
             <i className="fa-solid fa-arrow-left text-lg"></i>
           </button>
-          <h1 className="flex-1 text-center font-bold text-lg pr-10">분석 결과</h1>
+          <h1 className="flex-1 text-center font-bold text-lg pr-10 text-amber-800">분석 결과</h1>
         </div>
 
         <div className="flex-1 flex flex-col items-center justify-center p-6">
-          <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mb-6">
-            <i className="fa-solid fa-image text-3xl text-gray-400"></i>
+          <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mb-6 shadow-lg">
+            <span className="text-5xl">🖼️</span>
           </div>
-          <h2 className="text-xl font-bold text-gray-800 mb-2">기저귀 사진이 아니에요</h2>
-          <p className="text-gray-500 text-center mb-6 text-sm">배변이 보이는 기저귀를 선명하게 촬영해 주세요</p>
+          <h2 className="text-xl font-bold text-amber-900 mb-2">기저귀 사진이 아니에요</h2>
+          <p className="text-amber-700/70 text-center mb-6 text-sm">배변이 보이는 기저귀를 선명하게 촬영해 주세요</p>
           
-          <div className="w-28 h-28 rounded-xl overflow-hidden border-2 border-gray-200 mb-8">
+          <div className="w-28 h-28 rounded-2xl overflow-hidden border-2 border-amber-200 mb-8 shadow-sm">
             <img src={image} className="w-full h-full object-cover" alt="Uploaded" />
           </div>
 
           <button 
             onClick={onReset}
-            className="w-full max-w-xs h-12 bg-blue-500 text-white rounded-xl font-bold flex items-center justify-center gap-2"
+            className="w-full max-w-xs h-12 bg-gradient-to-r from-amber-400 to-orange-400 text-white rounded-2xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-orange-300/50"
           >
             <i className="fa-solid fa-camera"></i>
             다시 촬영하기
@@ -350,96 +350,95 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
   const firmnessPercent = (analysis.firmnessScore / 5) * 100;
 
   return (
-    <div className="min-h-screen min-h-[100dvh] bg-gray-100 text-gray-900 overflow-x-hidden">
+    <div className="min-h-screen min-h-[100dvh] bg-gradient-to-b from-amber-50 to-orange-50 text-amber-900 overflow-x-hidden">
       {/* Header */}
-      <div className="sticky top-0 z-20 bg-white px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] flex items-center border-b border-gray-200">
-        <button onClick={onReset} className="w-10 h-10 flex items-center justify-center">
+      <div className="sticky top-0 z-20 bg-white/80 backdrop-blur-md px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] flex items-center border-b border-amber-200/50">
+        <button onClick={onReset} className="w-10 h-10 flex items-center justify-center text-amber-700">
           <i className="fa-solid fa-arrow-left text-lg"></i>
         </button>
-        <h1 className="flex-1 text-center font-bold text-lg pr-10">분석 결과</h1>
+        <h1 className="flex-1 text-center font-bold text-lg pr-10 text-amber-800">🐣 분석 결과</h1>
       </div>
 
       {/* 콘텐츠 영역 */}
       <div className="overflow-x-hidden">
         {/* Demo Banner */}
-        <div className="bg-amber-50 border-b border-amber-100 px-3 py-2">
-          <p className="text-[11px] text-amber-700 text-center">
-            <i className="fa-solid fa-flask mr-1"></i>
-            데모용 임시 데이터입니다
+        <div className="bg-white/60 border-b border-amber-100 px-3 py-2">
+          <p className="text-[11px] text-amber-600 text-center">
+            🧪 데모용 임시 데이터입니다
           </p>
         </div>
 
         <div className="px-3 py-3 space-y-3 pb-[max(6rem,env(safe-area-inset-bottom))]">
         
         {/* ========== 사진 + 상태 요약 ========== */}
-        <div className="bg-white rounded-xl overflow-hidden shadow-sm">
+        <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-amber-100">
           {/* 사진 */}
           <div className="relative aspect-[4/3]">
             <img src={image} className="w-full h-full object-cover" alt="Diaper" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-amber-900/50 to-transparent"></div>
             
             {/* 상태 배지 */}
             <div className="absolute top-3 left-3">
-              <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full ${statusStyle.bg} text-white text-sm font-bold`}>
+              <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full ${statusStyle.bg} text-white text-sm font-bold shadow-lg`}>
                 <span>{statusStyle.icon}</span>
                 <span>{analysis.statusLabel}</span>
               </div>
             </div>
             
             {/* 신뢰도 */}
-            <div className="absolute top-3 right-3 bg-black/50 text-white text-[10px] px-2 py-1 rounded-full backdrop-blur-sm">
+            <div className="absolute top-3 right-3 bg-white/90 text-amber-700 text-[10px] px-2 py-1 rounded-full">
               신뢰도 {analysis.confidenceScore}%
             </div>
             
             {/* 하단 정보 */}
             <div className="absolute bottom-3 left-3 right-3">
-              <p className="text-white text-xs opacity-80">{analysis.analysisTime}</p>
+              <p className="text-white text-xs opacity-90">{analysis.analysisTime}</p>
             </div>
           </div>
 
           {/* 요약 섹션 */}
-          <div className="p-4">
+          <div className="p-4 bg-gradient-to-b from-amber-50/50 to-white">
             {/* 신호등 */}
             <div className="flex items-center justify-center gap-6 mb-3">
               <div className="flex flex-col items-center">
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center ${
-                  analysis.status === 'normal' ? 'bg-green-500 ring-2 ring-green-200' : 'bg-gray-200'
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                  analysis.status === 'normal' ? 'bg-green-500 ring-2 ring-green-200' : 'bg-amber-100'
                 }`}>
                   {analysis.status === 'normal' && <i className="fa-solid fa-check text-white text-xs"></i>}
                 </div>
-                <span className={`text-[10px] mt-1 ${analysis.status === 'normal' ? 'text-green-600 font-bold' : 'text-gray-400'}`}>좋음</span>
+                <span className={`text-[10px] mt-1 ${analysis.status === 'normal' ? 'text-green-600 font-bold' : 'text-amber-400'}`}>좋음</span>
               </div>
               <div className="flex flex-col items-center">
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center ${
-                  analysis.status === 'caution' ? 'bg-yellow-500 ring-2 ring-yellow-200' : 'bg-gray-200'
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                  analysis.status === 'caution' ? 'bg-yellow-500 ring-2 ring-yellow-200' : 'bg-amber-100'
                 }`}>
                   {analysis.status === 'caution' && <i className="fa-solid fa-minus text-white text-xs"></i>}
                 </div>
-                <span className={`text-[10px] mt-1 ${analysis.status === 'caution' ? 'text-yellow-600 font-bold' : 'text-gray-400'}`}>관찰</span>
+                <span className={`text-[10px] mt-1 ${analysis.status === 'caution' ? 'text-yellow-600 font-bold' : 'text-amber-400'}`}>관찰</span>
               </div>
               <div className="flex flex-col items-center">
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center ${
-                  analysis.status === 'warning' || analysis.status === 'emergency' ? 'bg-red-500 ring-2 ring-red-200' : 'bg-gray-200'
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                  analysis.status === 'warning' || analysis.status === 'emergency' ? 'bg-red-500 ring-2 ring-red-200' : 'bg-amber-100'
                 }`}>
                   {(analysis.status === 'warning' || analysis.status === 'emergency') && <i className="fa-solid fa-exclamation text-white text-xs"></i>}
                 </div>
-                <span className={`text-[10px] mt-1 ${analysis.status === 'warning' || analysis.status === 'emergency' ? 'text-red-600 font-bold' : 'text-gray-400'}`}>주의</span>
+                <span className={`text-[10px] mt-1 ${analysis.status === 'warning' || analysis.status === 'emergency' ? 'text-red-600 font-bold' : 'text-amber-400'}`}>주의</span>
               </div>
             </div>
 
             {/* 한줄 요약 */}
-            <p className="text-center text-base font-bold text-gray-800">
+            <p className="text-center text-base font-bold text-amber-900">
               {analysis.summaryLine}
             </p>
           </div>
         </div>
 
         {/* ========== 2. 분석 결과 (통합) ========== */}
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-          <div className="px-3 py-2.5 bg-white border-b border-gray-100 flex items-center justify-between">
+        <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-amber-100">
+          <div className="px-3 py-2.5 bg-gradient-to-r from-amber-50 to-orange-50 border-b border-amber-100 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <i className="fa-solid fa-robot text-blue-500"></i>
-              <h3 className="text-sm font-bold text-gray-800">AI 분석 결과</h3>
+              <span className="text-lg">🤖</span>
+              <h3 className="text-sm font-bold text-amber-800">AI 분석 결과</h3>
             </div>
             {aiAlertCount > 0 ? (
               <span className="bg-red-100 text-red-700 text-xs font-bold px-2 py-0.5 rounded-full">
@@ -456,7 +455,7 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
             {/* 굳기 */}
             <div>
               <div className="flex justify-between items-center mb-1.5">
-                <span className="text-sm font-medium text-gray-600">굳기</span>
+                <span className="text-sm font-medium text-amber-700">굳기</span>
                 <span className="text-sm font-bold text-gray-800">{analysis.firmness}</span>
               </div>
               <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
@@ -474,15 +473,15 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
 
             {/* 양 & 색상 */}
             <div className="grid grid-cols-2 gap-2">
-              <div className="bg-gray-50 rounded-lg p-3">
-                <p className="text-xs text-gray-500 mb-0.5">양</p>
-                <p className="font-bold text-gray-800 text-base">{analysis.amount}</p>
+              <div className="bg-amber-50 rounded-xl p-3">
+                <p className="text-xs text-amber-600 mb-0.5">양</p>
+                <p className="font-bold text-amber-900 text-base">{analysis.amount}</p>
               </div>
-              <div className="bg-gray-50 rounded-lg p-3">
-                <p className="text-xs text-gray-500 mb-0.5">색상</p>
+              <div className="bg-amber-50 rounded-xl p-3">
+                <p className="text-xs text-amber-600 mb-0.5">색상</p>
                 <div className="flex items-center gap-1.5">
-                  <div className="w-4 h-4 rounded-full border border-gray-200" style={{ backgroundColor: analysis.colorHex }}></div>
-                  <p className="font-bold text-gray-800 text-base">{analysis.colorCategory}</p>
+                  <div className="w-4 h-4 rounded-full border-2 border-white shadow-sm" style={{ backgroundColor: analysis.colorHex }}></div>
+                  <p className="font-bold text-amber-900 text-base">{analysis.colorCategory}</p>
                 </div>
               </div>
             </div>
@@ -493,8 +492,8 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
                 {aiChecks.map((check, idx) => (
                   <div 
                     key={idx} 
-                    className={`flex items-center gap-2.5 px-3 py-2 rounded-lg ${
-                      check.isAlert ? 'bg-red-50' : 'bg-gray-50'
+                    className={`flex items-center gap-2.5 px-3 py-2 rounded-xl ${
+                      check.isAlert ? 'bg-red-50' : 'bg-green-50'
                     }`}
                   >
                     <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
@@ -502,7 +501,7 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
                     }`}>
                       <i className={`fa-solid ${check.isAlert ? 'fa-exclamation' : 'fa-check'} text-white text-[10px]`}></i>
                     </div>
-                    <p className={`text-sm flex-1 ${check.isAlert ? 'text-red-700 font-medium' : 'text-gray-700'}`}>
+                    <p className={`text-sm flex-1 ${check.isAlert ? 'text-red-700 font-medium' : 'text-green-700'}`}>
                       {check.question}
                     </p>
                   </div>
@@ -538,13 +537,13 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
 
         {/* ========== 3-2. 부모 확인 체크리스트 ========== */}
         {parentChecks.length > 0 && (
-          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-            <div className="px-3 py-2.5 bg-white border-b border-gray-100 flex items-center justify-between">
+          <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-amber-100">
+            <div className="px-3 py-2.5 bg-gradient-to-r from-yellow-50 to-amber-50 border-b border-amber-100 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <i className="fa-solid fa-clipboard-check text-yellow-500"></i>
+                <span className="text-lg">✅</span>
                 <div>
-                  <h3 className="text-sm font-bold text-gray-800">엄마, 아빠 체크리스트</h3>
-                  <p className="text-xs text-gray-500">해당 증상이 있다면, 체크해 주세요</p>
+                  <h3 className="text-sm font-bold text-amber-800">엄마, 아빠 체크리스트</h3>
+                  <p className="text-xs text-amber-600">해당 증상이 있다면, 체크해 주세요</p>
                 </div>
               </div>
               {parentCheckedCount > 0 && (
@@ -554,7 +553,7 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
               )}
             </div>
             
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-amber-100">
               {parentChecks.map((check, idx) => {
                 const isChecked = checkedParentItems[idx];
                 
@@ -563,14 +562,14 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
                     key={idx}
                     onClick={() => toggleParentCheck(idx)}
                     className={`w-full px-3 py-3 flex items-center gap-3 text-left transition-colors ${
-                      isChecked ? 'bg-red-50' : 'bg-white active:bg-gray-50'
+                      isChecked ? 'bg-red-50' : 'bg-white active:bg-amber-50'
                     }`}
                   >
                     {/* 체크박스 */}
-                    <div className={`w-6 h-6 rounded border-2 flex items-center justify-center shrink-0 transition-all ${
+                    <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 transition-all ${
                       isChecked 
                         ? 'bg-red-500 border-red-500'
-                        : 'border-gray-300 bg-white'
+                        : 'border-amber-300 bg-white'
                     }`}>
                       {isChecked && (
                         <i className="fa-solid fa-check text-white text-xs"></i>
@@ -579,7 +578,7 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
                     
                     {/* 질문 텍스트 */}
                     <p className={`flex-1 text-sm ${
-                      isChecked ? 'text-red-700 font-medium' : 'text-gray-700'
+                      isChecked ? 'text-red-700 font-medium' : 'text-amber-800'
                     }`}>
                       {check.question}
                     </p>
@@ -594,13 +593,11 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
             }`}>
               {parentCheckedCount > 0 ? (
                 <p className="text-sm text-red-700 flex items-center gap-2">
-                  <i className="fa-solid fa-triangle-exclamation"></i>
-                  <span><strong>{parentCheckedCount}개</strong> 증상 해당. 관찰이 필요해요.</span>
+                  ⚠️ <span><strong>{parentCheckedCount}개</strong> 증상 해당. 관찰이 필요해요.</span>
                 </p>
               ) : (
                 <p className="text-sm text-green-700 flex items-center gap-2">
-                  <i className="fa-solid fa-circle-check"></i>
-                  <span>해당 증상 없음. 좋아요!</span>
+                  ✨ <span>해당 증상 없음. 좋아요!</span>
                 </p>
               )}
             </div>
@@ -608,13 +605,13 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
         )}
 
         {/* ========== 4. 추세 (7일 그래프) ========== */}
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-          <div className="px-3 py-2.5 bg-white border-b border-gray-100 flex items-center justify-between">
+        <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-amber-100">
+          <div className="px-3 py-2.5 bg-gradient-to-r from-orange-50 to-amber-50 border-b border-amber-100 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <i className="fa-solid fa-chart-simple text-purple-500"></i>
-              <h3 className="text-sm font-bold text-gray-800">7일 기록</h3>
+              <span className="text-lg">📈</span>
+              <h3 className="text-sm font-bold text-amber-800">7일 기록</h3>
             </div>
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-amber-600">
               평균 {analysis.weeklyAverage.toFixed(1)}회/일
             </span>
           </div>
@@ -640,23 +637,23 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
                           <div key={idx} className="flex-1 flex flex-col items-center justify-end h-full">
                             {/* 횟수 표시 */}
                             <span className={`text-xs font-bold mb-1 ${
-                              isToday ? 'text-purple-600' : 
-                              day.status === 'caution' ? 'text-yellow-600' : 'text-gray-500'
+                              isToday ? 'text-orange-600' : 
+                              day.status === 'caution' ? 'text-yellow-600' : 'text-amber-500'
                             }`}>
                               {day.count > 0 ? day.count : '-'}
                             </span>
                             {/* 바 */}
                             <div 
-                              className={`w-full max-w-[28px] rounded-t transition-all ${
-                                day.count === 0 ? 'bg-gray-200' :
+                              className={`w-full max-w-[28px] rounded-t-lg transition-all ${
+                                day.count === 0 ? 'bg-amber-100' :
                                 day.status === 'caution' ? 'bg-yellow-400' :
-                                isToday ? 'bg-purple-500' : 'bg-purple-300'
+                                isToday ? 'bg-gradient-to-t from-orange-400 to-amber-400' : 'bg-amber-300'
                               }`}
                               style={{ height: `${barHeight}px` }}
                             ></div>
                             {/* 요일 */}
                             <span className={`text-xs mt-2 ${
-                              isToday ? 'text-purple-600 font-bold' : 'text-gray-400'
+                              isToday ? 'text-orange-600 font-bold' : 'text-amber-400'
                             }`}>
                               {isToday ? '오늘' : day.day}
                             </span>
@@ -668,41 +665,41 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
                 })()}
 
                 {/* 요약 */}
-                <div className="mt-3 bg-gray-50 rounded-lg p-3 flex items-center justify-around">
+                <div className="mt-3 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl p-3 flex items-center justify-around">
                   <div className="text-center">
-                    <p className="text-2xl font-bold text-purple-600">{analysis.todayCount}</p>
-                    <p className="text-xs text-gray-500">오늘</p>
+                    <p className="text-2xl font-bold text-orange-500">{analysis.todayCount}</p>
+                    <p className="text-xs text-amber-600">오늘</p>
                   </div>
-                  <div className="w-px h-10 bg-gray-200"></div>
+                  <div className="w-px h-10 bg-amber-200"></div>
                   <div className="text-center">
-                    <p className="text-2xl font-bold text-gray-700">{analysis.weeklyAverage.toFixed(1)}</p>
-                    <p className="text-xs text-gray-500">주간 평균</p>
+                    <p className="text-2xl font-bold text-amber-700">{analysis.weeklyAverage.toFixed(1)}</p>
+                    <p className="text-xs text-amber-600">주간 평균</p>
                   </div>
                 </div>
               </>
             ) : (
-              <div className="text-center py-6 text-gray-400">
-                <i className="fa-solid fa-chart-simple text-2xl mb-1"></i>
-                <p className="text-sm">기록된 데이터가 없어요</p>
+              <div className="text-center py-6 text-amber-400">
+                <span className="text-3xl">📊</span>
+                <p className="text-sm mt-2">기록된 데이터가 없어요</p>
               </div>
             )}
           </div>
         </div>
 
         {/* ========== 5. 안내 (다음 행동) ========== */}
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-          <div className="px-3 py-2.5 bg-white border-b border-gray-100 flex items-center gap-2">
-            <i className="fa-solid fa-lightbulb text-green-500"></i>
-            <h3 className="text-sm font-bold text-gray-800">이렇게 해보세요</h3>
+        <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-amber-100">
+          <div className="px-3 py-2.5 bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100 flex items-center gap-2">
+            <span className="text-lg">💡</span>
+            <h3 className="text-sm font-bold text-green-800">이렇게 해보세요</h3>
           </div>
           
           <div className="p-3 space-y-2">
             {analysis.nextActions.map((action, idx) => (
-              <div key={idx} className="flex items-start gap-2.5 bg-green-50 rounded-lg p-3">
+              <div key={idx} className="flex items-start gap-2.5 bg-green-50 rounded-xl p-3">
                 <span className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-xs font-bold shrink-0">
                   {idx + 1}
                 </span>
-                <p className="text-sm text-gray-700 leading-relaxed">{action}</p>
+                <p className="text-sm text-green-800 leading-relaxed">{action}</p>
               </div>
             ))}
           </div>
@@ -710,32 +707,32 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
 
         {/* 병원 방문 안내 */}
         {analysis.hospitalAdvice && (
-          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-            <div className="px-3 py-2.5 bg-red-500 flex items-center gap-2">
-              <i className="fa-solid fa-hospital text-white"></i>
+          <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-red-200">
+            <div className="px-3 py-2.5 bg-gradient-to-r from-red-500 to-rose-500 flex items-center gap-2">
+              <span className="text-lg">🏥</span>
               <h3 className="text-sm font-bold text-white">병원 방문 권고</h3>
             </div>
-            <div className="p-3">
+            <div className="p-3 bg-red-50">
               <p className="text-sm text-red-700 leading-relaxed">{analysis.hospitalAdvice}</p>
             </div>
           </div>
         )}
 
         {/* ========== AI 권고 메시지 ========== */}
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-          <div className="px-3 py-2.5 bg-white border-b border-gray-100 flex items-center gap-2">
-            <i className="fa-solid fa-comment-dots text-slate-500"></i>
-            <h3 className="text-sm font-bold text-gray-800">AI 코멘트</h3>
+        <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-amber-100">
+          <div className="px-3 py-2.5 bg-gradient-to-r from-amber-50 to-yellow-50 border-b border-amber-100 flex items-center gap-2">
+            <span className="text-lg">💬</span>
+            <h3 className="text-sm font-bold text-amber-800">AI 코멘트</h3>
           </div>
           <div className="p-3">
-            <p className="text-sm text-gray-600 leading-relaxed">
+            <p className="text-sm text-amber-800 leading-relaxed">
               {analysis.aiInsight}
             </p>
           </div>
         </div>
 
         {/* 면책 조항 */}
-        <p className="text-[10px] text-gray-400 text-center leading-relaxed py-2">
+        <p className="text-[10px] text-amber-500 text-center leading-relaxed py-2">
           본 서비스는 참고용이며 의료 진단을 대신하지 않습니다.<br/>
           이상 증상 시 소아청소년과 전문의와 상담하세요.
         </p>
@@ -745,7 +742,7 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
           <button 
             onClick={handleSaveImage}
             disabled={isSaving}
-            className="flex-1 h-11 bg-gray-900 text-white rounded-lg font-bold text-sm flex items-center justify-center gap-2 disabled:opacity-50"
+            className="flex-1 h-12 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-2xl font-bold text-sm flex items-center justify-center gap-2 disabled:opacity-50 shadow-lg shadow-orange-300/30"
           >
             {isSaving ? <i className="fa-solid fa-spinner animate-spin"></i> : <i className="fa-solid fa-download"></i>}
             {isSaving ? '저장 중' : '저장'}
@@ -753,7 +750,7 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
           <button 
             onClick={handleShare}
             disabled={isSharing}
-            className="flex-1 h-11 bg-white border border-gray-300 text-gray-700 rounded-lg font-bold text-sm flex items-center justify-center gap-2 disabled:opacity-50"
+            className="flex-1 h-12 bg-white border-2 border-amber-300 text-amber-700 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 disabled:opacity-50"
           >
             {isSharing ? <i className="fa-solid fa-spinner animate-spin"></i> : <i className="fa-solid fa-share-nodes"></i>}
             {isSharing ? '준비 중' : '공유'}

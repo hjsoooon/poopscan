@@ -127,7 +127,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen min-h-[100dvh] w-full sm:max-w-lg sm:mx-auto md:shadow-2xl relative bg-black flex flex-col overflow-hidden">
+    <div className="min-h-screen min-h-[100dvh] w-full sm:max-w-lg sm:mx-auto md:shadow-2xl relative bg-gradient-to-b from-amber-50 to-orange-50 flex flex-col overflow-hidden">
       {state.view === 'camera' && (
         <CameraView 
           onCapture={handleCapture} 
@@ -145,7 +145,7 @@ const App: React.FC = () => {
       )}
 
       {state.view === 'result' && state.capturedImage && state.analysis && (
-        <div className="overflow-y-auto h-full bg-white">
+        <div className="overflow-y-auto h-full">
           <ResultView 
             image={state.capturedImage} 
             analysis={state.analysis} 
