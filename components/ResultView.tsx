@@ -357,7 +357,7 @@ const ResultView: React.FC<ResultViewProps> = ({ image, analysis, onReset }) => 
           <i className="fa-solid fa-arrow-left text-lg"></i>
         </button>
         <h1 className="flex-1 text-center font-bold text-lg pr-10 text-amber-800 flex items-center justify-center gap-2">
-          <img src={`${import.meta.env.BASE_URL}로고.png`} alt="푸스캔" className="w-5 h-5" />
+          <img src={`${import.meta.env.BASE_URL}로고.png`} alt="푸스캔" className="w-7 h-7" />
           분석 결과
         </h1>
       </div>
