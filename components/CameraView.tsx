@@ -119,7 +119,7 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, captur
         <div className="px-4 flex justify-between items-center" style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top, 0.75rem))' }}>
           <div className="w-9 h-9"></div>
           <div className="text-amber-800 font-bold text-sm tracking-tight px-4 py-2 rounded-full bg-white shadow-sm">
-            🐣 푸스캔
+            🐣 푸스캔 AI
           </div>
           <button 
             onClick={() => setShowHelp(true)}
@@ -264,7 +264,7 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, isProcessing, captur
               <i className="fa-solid fa-chevron-left text-sm"></i>
             </button>
             <div className="text-amber-800 font-bold text-sm tracking-tight px-4 py-2 rounded-full bg-white/90 shadow-sm">
-              🐣 푸스캔
+              🐣 푸스캔 AI
             </div>
             <button 
               onClick={() => setShowHelp(true)}
